@@ -67,7 +67,7 @@ data<-read.table(file="Your_local_path/Control_Expression_Matrix.txt",header = T
 Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Control"))
 
 ```
-
+### Step 2
 #### Single-cell alignment
 ```
 library('Asgard')
@@ -80,7 +80,7 @@ SC.data<-SCalignment(SC.list,CellCycle=TRUE,anchor.features=2000,by.CellType=TRU
 #Visualize alignment result
 DimPlot(SC.data, reduction = "umap", split.by = "sample", label = TRUE)
 ```
-
+### Step 3
 #### Single-cell comparison
 ```
 #Case sample names
@@ -91,7 +91,7 @@ Control.samples=c("Control")
 Gene.list<-GetGene(SC.integrated=SC.data,Case=Case.samples,Control=Control.samples,min.cells=3)
 
 ```
-
+### Step 4
 #### Mono-drug repurposing for every cell type
 ```
 #Load tissue specific drug reference
@@ -103,7 +103,7 @@ drug.ref.profiles = GetDrugRef(drug.response.path = 'Your_local_path/DrugReferen
 Drug.ident.res = GetDrug(gene.data = Gene.list, drug.ref.profiles = drug.ref.profiles, repurposing.unit = "drug", connectivity = "negative", drug.type = "FDA")
 ```
 Use ?GetDrug for more help
-
+### Step 5
 #### Drug combination for every cell type
 ```
 GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
@@ -119,7 +119,7 @@ Drug.combinations<-DrugCombination(SC.integrated=SC.data,
                       GSE92742.gctx=GSE92742.gctx.path,
                       GSE70138.gctx=GSE70138.gctx.path)
 ```
-
+### Step 6
 #### Select mono-drug therapies
 ```
 Final.drugs<-TopDrug(SC.integrated=SC.data,
