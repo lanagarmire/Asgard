@@ -8,6 +8,7 @@
 #' @param GSE70138.gctx The local path and the name of the cell.info text file. It's downloaded from https://ftp.ncbi.nlm.nih.gov/geo/series/GSE70nnn/GSE70138/suppl/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx.gz .
 #' @param GSE92742.gctx The local path and the name of the cell.info text file. It's downloaded from https://ftp.ncbi.nlm.nih.gov/geo/series/GSE92nnn/GSE92742/suppl/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx.gz .
 #' @param Output.Dir The output directory for the generated files.
+#' @export
 #' @import cmapR
 
 PrepareReference <- function(cell.info = NULL,
