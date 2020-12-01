@@ -14,7 +14,7 @@ install.packages('Seurat')
 ```
 devtools::install_github("lanagarmire/Asgard")
 ```
-## Load Asgard
+### Load Asgard
 ```
 library('Asgard')
 ```
