@@ -6,7 +6,7 @@ Using scRNA-seq data, Asgard repurposes mono-drugs for every single cell populat
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
     
-BiocManager::install("SingleR","limma","cmapR")
+BiocManager::install(c("SingleR","limma","cmapR"))
 
 install.packages('Seurat')
 ```
