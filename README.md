@@ -59,9 +59,11 @@ Please use '?PrepareReference' for more help.
 #### Load single-cell RNA-seq data
 ```
 library('Seurat')
+
 #Case sample
 data<-read.table(file="Your_local_path/Case_Expression_Matrix.txt",header = T,check.names=FALSE)
 Case <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Case"))
+
 #Control sample
 data<-read.table(file="Your_local_path/Control_Expression_Matrix.txt",header = T,check.names=FALSE)
 Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Control"))
@@ -71,12 +73,16 @@ Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, mi
 #### Single-cell alignment
 ```
 library('Asgard')
+
 #Creat data list
 SC.list<-list(Case=Case,Control=Control)
+
 #Single-cell alignment without cell type annotation
 SC.data<-SCalignment(SC.list,CellCycle=TRUE,anchor.features=2000,by.CellType=FALSE)
+
 #Single-cell alignment with cell type annotation (optional)
 SC.data<-SCalignment(SC.list,CellCycle=TRUE,anchor.features=2000,by.CellType=TRUE)
+
 #Visualize alignment result
 DimPlot(SC.data, reduction = "umap", split.by = "sample", label = TRUE)
 ```
@@ -86,10 +92,15 @@ Please use '?SCalignment' for more help.
 ```
 #Case sample names
 Case.samples=c("Case")
+
 #Control sample names
 Control.samples=c("Control")
+
 #Get differential gene expression profiles for every cell type (or cluster if without annotation)
-Gene.list<-GetGene(SC.integrated=SC.data,Case=Case.samples,Control=Control.samples,min.cells=3)
+Gene.list<-GetGene(SC.integrated=SC.data,
+                  Case=Case.samples,
+                  Control=Control.samples,
+                  min.cells=3)
 
 ```
 Please use '?GetGene' for more help.
@@ -100,9 +111,15 @@ Please use '?GetGene' for more help.
 my_gene_info<-read.table(file="Your_local_path/DrugReference/breast_gene_info.txt",sep="\t",header = T,quote = "")
 my_drug_info<-read.table(file="Your_local_path/DrugReference/breast_drug_info.txt",sep="\t",header = T,quote = "")
 drug.ref.profiles = GetDrugRef(drug.response.path = 'Your_local_path/DrugReference/breast_rankMatrix.txt',
-                                 probe.to.genes = my_gene_info, drug.info = my_drug_info)
+                               probe.to.genes = my_gene_info, 
+                               drug.info = my_drug_info)
+
 #Repurpose mono-drugs for every cell type                               
-Drug.ident.res = GetDrug(gene.data = Gene.list, drug.ref.profiles = drug.ref.profiles, repurposing.unit = "drug", connectivity = "negative", drug.type = "FDA")
+Drug.ident.res = GetDrug(gene.data = Gene.list, 
+                        drug.ref.profiles = drug.ref.profiles, 
+                        repurposing.unit = "drug", 
+                        connectivity = "negative", 
+                        drug.type = "FDA")
 ```
 Use ?GetDrug for more help
 ### Step 5
