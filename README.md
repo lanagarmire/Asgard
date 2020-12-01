@@ -80,6 +80,7 @@ SC.data<-SCalignment(SC.list,CellCycle=TRUE,anchor.features=2000,by.CellType=TRU
 #Visualize alignment result
 DimPlot(SC.data, reduction = "umap", split.by = "sample", label = TRUE)
 ```
+Please use '?SCalignment' for more help.
 ### Step 3
 #### Single-cell comparison
 ```
@@ -91,6 +92,7 @@ Control.samples=c("Control")
 Gene.list<-GetGene(SC.integrated=SC.data,Case=Case.samples,Control=Control.samples,min.cells=3)
 
 ```
+Please use '?GetGene' for more help.
 ### Step 4
 #### Mono-drug repurposing for every cell type
 ```
@@ -119,6 +121,7 @@ Drug.combinations<-DrugCombination(SC.integrated=SC.data,
                       GSE92742.gctx=GSE92742.gctx.path,
                       GSE70138.gctx=GSE70138.gctx.path)
 ```
+Please use '?DrugCombination' for more help.
 ### Step 6
 #### Select mono-drug therapies
 ```
