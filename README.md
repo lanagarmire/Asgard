@@ -14,6 +14,10 @@ install.packages('Seurat')
 ```
 devtools::install_github("lanagarmire/Asgard")
 ```
+## Load Asgard
+```
+library('Asgard')
+```
 ## Prepare Drug Referecne
 ### Step 1
 #### Download L1000 Connectivity Map perturbational profiles GSE70138 and GSE92742 from GEO
