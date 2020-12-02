@@ -123,7 +123,7 @@ Drug.ident.res = GetDrug(gene.data = Gene.list,
 ```
 Use ?GetDrug for more help
 ### Step 5
-#### Drug combination for every cell type
+#### Drug combination analysis
 ```
 GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 GSE70138.gctx.path="Your_local_path/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
