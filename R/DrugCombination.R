@@ -1,5 +1,5 @@
-#' @title Estimation of the Drug Combination.
-#' @description  It helps to identify drug combinations that can best reverse the target genes’ expression in all case cell type.
+#' @title Treatment Efficacy of the Drug Combination.
+#' @description  It evaluates treatment efficacy to identify drug combinations that can best reverse the target genes’ expression in diseased cells in case samples.
 #' @details This function evaluates treatment efficacy and ranks drug combinations using therapeutics score, which integrates gene responses to multiple drugs, the proportion of genes, and cells treated by combined drugs.
 #' @param SC.integrated A Seurat object of aligned cells from SCalignment function.
 #' @param Gene.data A list of differnential gene expression profiles for every cell type. It's from GetGene function.
@@ -10,7 +10,7 @@
 #' @param GSE92742.gctx The local path and the name of the gctx file from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).
 #' @param GSE70138.gctx The local path and the name of the gctx file from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).
 #' @param Case A vector contains names of case samples.
-#' @param Tissue Reference tissue. Usually it's the same with drug reference tissue.
+#' @param Tissue Reference tissue. Usually it's same with the drug reference tissue.
 #' @return A data frame of drug combinations with therapeutics scores and FDR.
 #' @export
 #' @import Seurat cmapR

@@ -2,7 +2,7 @@
 % Please edit documentation in R/DrugCombination.R
 \name{DrugCombination}
 \alias{DrugCombination}
-\title{Estimation of the Drug Combination.}
+\title{Treatment Efficacy of the Drug Combination.}
 \usage{
 DrugCombination(
   SC.integrated = SC.data,
@@ -36,13 +36,13 @@ DrugCombination(
 
 \item{Case}{A vector contains names of case samples.}
 
-\item{Tissue}{Reference tissue. Usually it's the same with drug reference tissue.}
+\item{Tissue}{Reference tissue. Usually it's same with the drug reference tissue.}
 }
 \value{
 A data frame of drug combinations with therapeutics scores and FDR.
 }
 \description{
-It helps to identify drug combinations that can best reverse the target genes’ expression in all case cell type.
+It evaluates treatment efficacy to identify drug combinations that can best reverse the target genes’ expression in diseased cells in case samples.
 }
 \details{
 This function evaluates treatment efficacy and ranks drug combinations using therapeutics score, which integrates gene responses to multiple drugs, the proportion of genes, and cells treated by combined drugs.
