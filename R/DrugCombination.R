@@ -31,7 +31,7 @@ DrugCombination <- function(SC.integrated=SC.data,
 
     ##Cell proportion
     cells <- SC.integrated@meta.data
-    if(Case){
+    if(length(Case)>0){
     cells <- subset(cells,sample %in% Case)
     }
     cells <- cells$celltype
