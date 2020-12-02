@@ -10,17 +10,17 @@ BiocManager::install(c("SingleR","limma","cmapR"))
 
 install.packages('Seurat')
 ```
-### Install Asgard
+#### Install Asgard
 ```
 devtools::install_github("lanagarmire/Asgard")
 ```
-### Load Asgard
+#### Load Asgard
 ```
 library('Asgard')
 ```
-## Prepare Drug Referecne
-### Step 1
-#### Download L1000 Connectivity Map perturbational profiles GSE70138 and GSE92742 from GEO
+### Prepare Drug Referecne
+#### Step 1
+##### Download L1000 Connectivity Map perturbational profiles GSE70138 and GSE92742 from GEO
 
 [GSE70138_Broad_LINCS_cell_info_2017-04-28.txt](https://ftp.ncbi.nlm.nih.gov/geo/series/GSE70nnn/GSE70138/suppl/GSE70138_Broad_LINCS_cell_info_2017-04-28.txt.gz)
 
@@ -36,8 +36,8 @@ library('Asgard')
 
 [GSE92742_Broad_LINCS_sig_info.txt](https://ftp.ncbi.nlm.nih.gov/geo/series/GSE92nnn/GSE92742/suppl/GSE92742_Broad_LINCS_sig_info.txt.gz)
 
-### Step 2 
-#### Generate tissue specific drug references from GSE70138 and GSE92742
+#### Step 2 
+##### Generate tissue specific drug references from GSE70138 and GSE92742
 Unzip downloaded files, revise the Your_local_path and run the following code:
 ```
 library('Asgard')
@@ -54,9 +54,9 @@ PrepareReference(cell.info="Your_local_path/GSE70138_Broad_LINCS_cell_info_2017-
 ```
 Please use '?PrepareReference' for more help.
 
-## Drug Repurposing
-### Step 1
-#### Load single-cell RNA-seq data
+### Drug Repurposing
+#### Step 1
+##### Load single-cell RNA-seq data
 ```
 library('Seurat')
 
@@ -69,8 +69,8 @@ data<-read.table(file="Your_local_path/Control_Expression_Matrix.txt",header = T
 Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Control"))
 
 ```
-### Step 2
-#### Single-cell alignment
+#### Step 2
+##### Single-cell alignment
 ```
 library('Asgard')
 
@@ -87,8 +87,8 @@ SC.data<-SCalignment(SC.list,CellCycle=TRUE,anchor.features=2000,by.CellType=TRU
 DimPlot(SC.data, reduction = "umap", split.by = "sample", label = TRUE)
 ```
 Please use '?SCalignment' for more help.
-### Step 3
-#### Single-cell comparison
+#### Step 3
+##### Single-cell comparison
 ```
 #Case sample names
 Case.samples=c("Case")
@@ -104,8 +104,8 @@ Gene.list<-GetGene(SC.integrated=SC.data,
 
 ```
 Please use '?GetGene' for more help.
-### Step 4
-#### Mono-drug repurposing for every cell type
+#### Step 4
+##### Mono-drug repurposing for every cell type
 ```
 #Load tissue specific drug reference
 my_gene_info<-read.table(file="Your_local_path/DrugReference/breast_gene_info.txt",sep="\t",header = T,quote = "")
@@ -122,8 +122,8 @@ Drug.ident.res = GetDrug(gene.data = Gene.list,
                         drug.type = "FDA")
 ```
 Use ?GetDrug for more help
-### Step 5
-#### Drug combination analysis
+#### Step 5
+##### Drug combination analysis
 ```
 GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 GSE70138.gctx.path="Your_local_path/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
