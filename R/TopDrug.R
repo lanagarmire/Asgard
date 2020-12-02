@@ -37,12 +37,12 @@ TopDrug <- function(SC.integrated = SC.data,
     }
     if(length(Drugs)>0){
       Cd <- subset(Cd, Drug.name %in% Drugs)
-      FDRs <- Cd$FDR
-      temp <- data.frame(Drug=Drugs,Cell.type=i,Cell.type.coverage=cells.freq[i],FDR=FDRs,row.names = NULL)
+      temp <- data.frame(Drug=Cd$Drug.name,Cell.type=i,Cell.type.coverage=cells.freq[i],FDR=Cd$FDR,row.names = NULL)
       Drug.list <- rbind(Drug.list,temp)
     }
   }
-  Drug.list <- unique(Drug.list)
+  Drug.list <- Drug.list[order(Drug.list$FDR, decreasing = F),]
+  Drug.list <- Drug.list[!duplicated(Drug.list),]
   Drug.coverage <- tapply(Drug.list$Cell.type.coverage, Drug.list$Drug,sum)
   temp.coverage <- Drug.coverage[Drug.list$Drug]
   Drug.list$Drug.coverage <- temp.coverage
