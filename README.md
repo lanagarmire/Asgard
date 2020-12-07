@@ -24,7 +24,7 @@ wget https://bioconductor.org/packages/release/data/experiment/src/contrib/celld
 #Start R
 R
 
-#Install celldex from local source package
+#Install celldex from the local source package
 install.packages('celldex_1.0.0.tar.gz')
 
 ```
