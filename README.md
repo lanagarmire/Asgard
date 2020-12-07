@@ -15,11 +15,15 @@ BiocManager::install(c("SingleR","limma","cmapR","celldex"))
 install.packages('Seurat')
 
 If you can't install a package with above commands, try to download the gz file and install it locally.
+
 Take celldex package as an example:
+
 #Downlaod the source package of celldex in linux
 wget https://bioconductor.org/packages/release/data/experiment/src/contrib/celldex_1.0.0.tar.gz
+
 #Start R
 R
+
 #Install celldex from local source package
 install.packages('celldex_1.0.0.tar.gz')
 
