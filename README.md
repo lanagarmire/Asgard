@@ -1,14 +1,28 @@
 ## Asgard: A Single-cell Guided pipeline for Accurate Repurposing of Drugs 
 Using scRNA-seq data, Asgard repurposes mono-drugs for every single cell population and predicts personalized drug combinations to address the cellular heterogeneity of patients. 
 ### Installation
+#### Install devtools if you don't have it
+```
+install.packages('devtools')
+```
 #### Install dependency packages
 ```
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
     
-BiocManager::install(c("SingleR","limma","cmapR"))
+BiocManager::install(c("SingleR","limma","cmapR","celldex"))
 
 install.packages('Seurat')
+
+If you can't install a package with above commands, try to download the gz file and install it locally.
+Take celldex package as an example:
+#Downlaod the source package of celldex in linux
+wget https://bioconductor.org/packages/release/data/experiment/src/contrib/celldex_1.0.0.tar.gz
+#Start R
+R
+#Install celldex from local source package
+install.packages('celldex_1.0.0.tar.gz')
+
 ```
 #### Install Asgard
 ```
