@@ -7,7 +7,7 @@
 #' @param by.CellType logical; if TRUE, will annotate cell type. The default value is FALSE.
 #' @return A Seurat object of aligned cells.
 #' @export
-#' @import Seurat SingleR
+#' @import Seurat SingleR celldex
 
 SCalignment <- function(SC.list=SC.list,CellCycle=TRUE,anchor.features=2000,by.CellType=FALSE){
     for (i in 1:length(SC.list)) {
@@ -38,7 +38,7 @@ SCalignment <- function(SC.list=SC.list,CellCycle=TRUE,anchor.features=2000,by.C
     ##Cell Type Annotation
     if(by.CellType == TRUE){
      data <- as.matrix(SC.integrated@assays$RNA@data)
-     hpca.se <- HumanPrimaryCellAtlasData()
+     hpca.se <- celldex::HumanPrimaryCellAtlasData
      pred.hpca <- SingleR(test = data, ref = hpca.se, assay.type.test=1, labels = hpca.se$label.main)
      cell.label <- data.frame(row.names = row.names(pred.hpca),celltype=pred.hpca$labels)
      if(length(SC.integrated@meta.data$celltype)>0){

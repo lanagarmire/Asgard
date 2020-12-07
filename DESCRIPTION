@@ -6,8 +6,8 @@ Author: Bing He [aut], Lana Garmire [aut, cre]
 Maintainer: Bing He <hbing@med.umich.edu>
 Description: Asgard repurposes drugs for every single cell population and predicts personalized combination of drugs to address cellular heterogeneity of patients. 
 Depends: R (>= 3.5.0)
-Imports: Seurat, cmapR, limma, SingleR 
-Suggests: dplyr, celldex, cowplot
+Imports: Seurat, cmapR, limma, SingleR, celldex
+Suggests: dplyr, cowplot
 License: GPLv3
 Encoding: UTF-8
 LazyData: true
