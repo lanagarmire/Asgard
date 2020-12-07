@@ -157,3 +157,4 @@ Final.combinations<-TopCombination(Drug.combination=Drug.combinations,
                    Min.combination.score=1
 )
 ```
+Demo codes using real datasets are available at: https://github.com/lanagarmire/Single-cell-drug-repositioning
