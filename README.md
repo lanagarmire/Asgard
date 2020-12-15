@@ -70,6 +70,7 @@ PrepareReference(cell.info="Your_local_path/GSE70138_Broad_LINCS_cell_info_2017-
                  GSE92742.gctx = "Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx",
                  Output.Dir = "Your_local_path/DrugReference/"
 )
+
 #Note: the file names here maybe different after unzipping.
 ```
 Please use '?PrepareReference' for more help.
