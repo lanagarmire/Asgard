@@ -142,7 +142,7 @@ Drug.ident.res = GetDrug(gene.data = Gene.list,
                         connectivity = "negative", 
                         drug.type = "FDA")
 ```
-Use ?GetDrug for more help
+Use '?GetDrug' for more help
 #### Step 5
 #### Drug combination analysis
 ```
