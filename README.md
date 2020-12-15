@@ -27,6 +27,8 @@ R
 #Install celldex from the local source package
 install.packages('celldex_1.0.0.tar.gz')
 
+#Note: some dependency packages require R version newer than 4.0
+
 ```
 #### Install Asgard
 ```
@@ -68,7 +70,7 @@ PrepareReference(cell.info="Your_local_path/GSE70138_Broad_LINCS_cell_info_2017-
                  GSE92742.gctx = "Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx",
                  Output.Dir = "Your_local_path/DrugReference/"
 )
-
+#Note: the file names here maybe different after unzipping.
 ```
 Please use '?PrepareReference' for more help.
 
