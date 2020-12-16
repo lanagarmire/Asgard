@@ -90,7 +90,7 @@ data<-read.table(file="Your_local_path/Control_Expression_Matrix.txt",header = T
 Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Control"))
 
 ```
-Case_Expression_Matrix.txt and Control_Expression_Matrix.txt are single-cell gene expression matrix files you have. Demo codes using public datasets are available at: https://github.com/lanagarmire/Single-cell-drug-repositioning
+Case_Expression_Matrix.txt and Control_Expression_Matrix.txt are single-cell gene expression matrix files that you want to use for analysis. Demo codes using public datasets are available at: https://github.com/lanagarmire/Single-cell-drug-repositioning
 #### Step 2
 #### Single-cell alignment
 ```
