@@ -34,6 +34,7 @@ SCalignment <- function(SC.list=SC.list,CellCycle=TRUE,anchor.features=2000,by.C
     SC.integrated <- RunUMAP(SC.integrated, reduction = "pca", dims = 1:15)
     SC.integrated <- FindNeighbors(SC.integrated, reduction = "pca", dims = 1:15)
     SC.integrated <- FindClusters(SC.integrated, algorithm = 1, resolution = 0.4)
+    SC.integrated@meta.data$seurat_clusters <- SC.integrated@meta.data$seurat_clusters + 1
 
     ##Cell Type Annotation
     if(by.CellType == TRUE){
