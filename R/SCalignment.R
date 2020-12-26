@@ -61,7 +61,7 @@ SCalignment <- function(SC.list=SC.list,CellCycle=TRUE,anchor.features=2000,by.C
      new.cells <- new.cells[cell.id,]
      SC.integrated@meta.data$celltype <- new.cells$celltype
     }else{
-     SC.integrated@meta.data$celltype <- paste0("C",SC.integrated@meta.data$seurat_clusters)
+     SC.integrated@meta.data$celltype <- paste0("C",as.numeric(SC.integrated@meta.data$seurat_clusters))
     }
     return(SC.integrated)
 }
