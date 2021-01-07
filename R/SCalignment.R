@@ -51,7 +51,6 @@ SCalignment <- function(SC.list=SC.list,CellCycle=TRUE,anchor.features=2000,by.C
       sub.data <- subset(SC.integrated,seurat_clusters==i)
       temp <- table(sub.data@meta.data$celltype)
       best.cell <- names(which(temp==temp[which.max(temp)]))
-      SC.integrated@meta.data
       cells.temp <- data.frame(cell.id=row.names(sub.data@meta.data),celltype=best.cell)
       new.cells <- rbind(new.cells,cells.temp)
      }
