@@ -7,7 +7,7 @@
 #' @param by.CellType logical; if TRUE, will annotate cell type. The default value is FALSE.
 #' @return A Seurat object of aligned cells.
 #' @export
-#' @import Seurat SingleR celldex
+#' @import Seurat SingleR
 
 SCalignment <- function(SC.list=SC.list,CellCycle=TRUE,anchor.features=2000,by.CellType=FALSE){
     for (i in 1:length(SC.list)) {
