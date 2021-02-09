@@ -168,11 +168,15 @@ DrugCombination <- function(SC.integrated=SC.data,
     }
     Score.list <- apply(Selected.Drug.combinations, 2, Combination.treated.score)
     ref.score <- unlist(Score.list)
-    P.value <- function(Score) {
-      temp <- ks.test(Score,ref.score)
-      p.value <- temp$p.value
-      return(p.value)
-    }
+	P.value <- function(Score) {
+	  if(length(Score)>1 && length(ref.score)>1){
+	  temp <- ks.test(Score, ref.score)
+	  p.value <- temp$p.value
+	  return(p.value)
+	  }else{
+		return(1)
+	  }
+	}
     pvalues <- unlist(suppressWarnings(lapply(Score.list, P.value)))
     combination.scores <- unlist(suppressWarnings(lapply(Score.list,mean)))
     Combination.table <- as.data.frame(t(Selected.Drug.combinations))
