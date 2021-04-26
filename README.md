@@ -79,7 +79,7 @@ library('Asgard')
 Unzip downloaded files, revise the Your_local_path and run the following code:
 ```
 library('Asgard')
-
+#Please replace Your_local_path with your real local folder
 PrepareReference(cell.info="Your_local_path/GSE70138_Broad_LINCS_cell_info_2017-04-28.txt",
                  gene.info="Your_local_path/GSE70138_Broad_LINCS_gene_info_2017-03-06.txt",
                  GSE70138.sig.info = "Your_local_path/GSE70138_Broad_LINCS_sig_info_2017-03-06.txt",
@@ -101,11 +101,11 @@ library('Seurat')
 
 #Case sample
 data<-read.table(file="Your_local_path/Case_Expression_Matrix.txt",header = T,check.names=FALSE)
-Case <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Case"))
+Case <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="CaseSample"))
 
 #Control sample
 data<-read.table(file="Your_local_path/Control_Expression_Matrix.txt",header = T,check.names=FALSE)
-Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Control"))
+Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="ControlSample"))
 
 ```
 - Case_Expression_Matrix.txt and Control_Expression_Matrix.txt are single-cell gene expression matrix files that you want to use for analysis. 
@@ -134,10 +134,10 @@ Please use '?SCalignment' for more help.
 #### Single-cell comparison
 ```
 #Case sample names
-Case.samples=c("Case")
+Case.samples=c("CaseSample")
 
 #Control sample names
-Control.samples=c("Control")
+Control.samples=c("ControlSample")
 
 #Get differential gene expression profiles for every cell type (or cluster if without annotation)
 Gene.list<-GetGene(SC.integrated=SC.data,
@@ -150,7 +150,8 @@ Please use '?GetGene' for more help.
 #### Step 4
 #### Mono-drug repurposing for every cell type
 ```
-#Load tissue specific drug reference
+#Load tissue specific drug reference produced by PrepareReference function as mentioned above
+#Please replace Your_local_path with your real local folder
 my_gene_info<-read.table(file="Your_local_path/DrugReference/breast_gene_info.txt",sep="\t",header = T,quote = "")
 my_drug_info<-read.table(file="Your_local_path/DrugReference/breast_drug_info.txt",sep="\t",header = T,quote = "")
 drug.ref.profiles = GetDrugRef(drug.response.path = 'Your_local_path/DrugReference/breast_rankMatrix.txt',
@@ -168,6 +169,7 @@ Use '?GetDrug' for more help
 #### Step 5
 #### Drug combination analysis
 ```
+#Please replace Your_local_path with your real local folder
 GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 GSE70138.gctx.path="Your_local_path/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
 Drug.combinations<-DrugCombination(SC.integrated=SC.data,
