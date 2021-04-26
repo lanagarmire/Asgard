@@ -56,7 +56,7 @@ devtools::install_github("lanagarmire/Asgard")
 ```
 library('Asgard')
 ```
-## Prepare Drug Referecne
+## Prepare Drug Referecne Library
 #### Step 1
 #### Download L1000 Connectivity Map perturbational profiles GSE70138 and GSE92742 from GEO
 
