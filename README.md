@@ -108,10 +108,10 @@ data<-read.table(file="Your_local_path/Control_Expression_Matrix.txt",header = T
 Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="Control"))
 
 ```
->Case_Expression_Matrix.txt and Control_Expression_Matrix.txt are single-cell gene expression matrix files that you want to use for analysis. 
->Case matrix can be downloaded at Human Breast Cancer Epithelial Cells: [GSE123926_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE123926&format=file)
->Control matrix can be downloaded at Normal Human Breast Epithelial Cells: [GSE113197_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE113197&format=file)
->Demo codes using these real datasets are available at: https://github.com/lanagarmire/Single-cell-drug-repositioning
+-Case_Expression_Matrix.txt and Control_Expression_Matrix.txt are single-cell gene expression matrix files that you want to use for analysis. 
+-Case matrix can be downloaded at Human Breast Cancer Epithelial Cells: [GSE123926_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE123926&format=file)
+-Control matrix can be downloaded at Normal Human Breast Epithelial Cells: [GSE113197_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE113197&format=file)
+-Demo codes using these real datasets are available at: https://github.com/lanagarmire/Single-cell-drug-repositioning
 #### Step 2
 #### Single-cell alignment
 ```
