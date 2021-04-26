@@ -99,6 +99,8 @@ Please use '?PrepareReference' for more help.
 ```
 library('Seurat')
 
+#Please replace Your_local_path with your real local folder
+
 #Case sample
 data<-read.table(file="Your_local_path/Case_Expression_Matrix.txt",header = T,check.names=FALSE)
 Case <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="CaseSample"))
