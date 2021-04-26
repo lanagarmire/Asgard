@@ -1,4 +1,4 @@
-# Asgard: A Single-cell Guided pipeline for Accurate Repurposing of Drugs 
+## Asgard: A Single-cell Guided pipeline for Accurate Repurposing of Drugs 
 Using scRNA-seq data, Asgard repurposes mono-drugs for every single cell population and predicts personalized drug combinations to address the cellular heterogeneity of patients. 
 ## System Requirements
 #### Hardware requirements
@@ -54,7 +54,7 @@ devtools::install_github("lanagarmire/Asgard")
 ```
 library('Asgard')
 ```
-### Prepare Drug Referecne
+## Prepare Drug Referecne
 #### Step 1
 #### Download L1000 Connectivity Map perturbational profiles GSE70138 and GSE92742 from GEO
 
@@ -91,7 +91,7 @@ PrepareReference(cell.info="Your_local_path/GSE70138_Broad_LINCS_cell_info_2017-
 ```
 Please use '?PrepareReference' for more help.
 
-### Drug Repurposing
+## Drug Repurposing
 #### Step 1
 #### Load single-cell RNA-seq data
 ```
