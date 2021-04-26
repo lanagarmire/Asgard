@@ -92,6 +92,7 @@ PrepareReference(cell.info="Your_local_path/GSE70138_Broad_LINCS_cell_info_2017-
 )
 
 #Note: the file names here maybe different after unzipping.
+#Please note that it takes more than one hour to produce drug references in a standard computer with RAM>64GB.
 ```
 Please use '?PrepareReference' for more help.
 
@@ -169,6 +170,7 @@ Drug.ident.res = GetDrug(gene.data = Gene.list,
                         repurposing.unit = "drug", 
                         connectivity = "negative", 
                         drug.type = "FDA")
+                       
 ```
 Use '?GetDrug' for more help
 #### Step 5
