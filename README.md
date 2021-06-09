@@ -120,7 +120,7 @@ Normal Human Breast Epithelial Cells (GSE113197): [GSE113197_RAW.tar](https://ww
 library('Seurat')
 
 #Load normal sample Ind5 from GSE113197 dataset
-celltype<-read.table(file="Normal_celltype.txt",header = T,check.names=FALSE)
+celltype<-read.table(file="https://raw.githubusercontent.com/lanagarmire/Single-cell-drug-repositioning/master/Normal_celltype.txt",header = T,check.names=FALSE)
 data<-read.table(file="GSM3099847_Ind5_Expression_Matrix.txt",header = T,check.names=FALSE)
 row.names(data)<-data[,1]
 data<-data[,-1]
