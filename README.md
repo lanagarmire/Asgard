@@ -224,10 +224,10 @@ sample<-SC.data@meta.data$sample
 sample[which(sample=="Ind5")]<-"Normal1"
 sample[which(sample=="Ind6")]<-"Normal2"
 sample[which(sample=="Ind7")]<-"Normal3"
-SC.data@meta.data$sample<-sample
+SC.integrated@meta.data$sample<-sample
 
 #Visualize alignment result
-DimPlot(SC.data, reduction = "umap", split.by = "sample",group.by = "celltype")
+DimPlot(SC.integrated, reduction = "umap", split.by = "sample",group.by = "celltype")
 ```
 #### Step 3
 #### Single-cell comparison
@@ -308,7 +308,7 @@ library('Seurat')
 
 GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 GSE70138.gctx.path="Your_local_path/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
-Drug.combinations<-DrugCombination(SC.integrated=SC.data,
+Drug.combinations<-DrugCombination(SC.integrated=SC.integrated,
                       Gene.data=Gene.list,
                       Drug.data=Drug.ident.res,
                       Drug.FDR=0.1,
