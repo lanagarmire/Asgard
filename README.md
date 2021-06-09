@@ -243,6 +243,7 @@ Control=c("Normal1","Normal2","Normal3")
 library('limma')
 DefaultAssay(SC.integrated) <- "RNA"
 set.seed(123456)
+min.cells=3 # The minimum number of cells for a cell type. A cell type is omitted if it has less cells than the minimum number.
 Gene.list <- list()
 C_names <- NULL
 for(i in unique(SC.integrated@meta.data$celltype)){
