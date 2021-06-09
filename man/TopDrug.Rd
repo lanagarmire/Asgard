@@ -13,7 +13,7 @@ TopDrug(
 )
 }
 \arguments{
-\item{SC.integrated}{Single cell alignment result from SCalignment function.}
+\item{SC.integrated}{A Seurat object of aligned single cells.}
 
 \item{Drug.data}{Drug repurosing result from drug.ident function.}
 

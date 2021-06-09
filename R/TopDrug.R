@@ -1,14 +1,14 @@
 #' @title Single Drug Selection.
 #' @description  Select single drugs for every cell population by FDR and drug type, and summarize cell coverage for selected drugs.
 #' @details Input raw drug repurosing result and return the top drugs with summary of cell coverage.
-#' @param SC.integrated Single cell alignment result from SCalignment function.
+#' @param SC.integrated A Seurat object of aligned single cells.
 #' @param Drug.data Drug repurosing result from drug.ident function.
 #' @param Drug.FDR The FDR threshold to select drug. The default value is 0.1.
 #' @param FDA.drug.only logical; if TRUE, will only return FDA-approved drugs.
 #' @param Case An vector of case (diseased) samples.Only case sammples are involved in the calculation of coverage.
 #' @return A data frame of selected drugs with summary of cell coverage.
 #' @export
-#' @import Seurat
+#' @import 
 
 TopDrug <- function(SC.integrated = SC.data,
                     Drug.data = Drug.ident.res,
