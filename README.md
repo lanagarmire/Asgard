@@ -301,6 +301,9 @@ Use '?GetDrug' for more help
 #### Step 5
 #### Drug combination analysis
 ```
+library('Asgard')
+library('Seurat')
+
 #Please replace Your_local_path with your real local folder
 
 GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
@@ -320,6 +323,9 @@ Please use '?DrugCombination' for more help.
 #### Step 6
 #### Select mono-drug therapies
 ```
+library('Asgard')
+library('Seurat')
+
 Final.drugs<-TopDrug(SC.integrated=SC.data,
                    Drug.data=Drug.ident.res,
                    Drug.FDR=0.1,
@@ -330,6 +336,7 @@ Final.drugs<-TopDrug(SC.integrated=SC.data,
 
 #### Select drug combination therapies
 ```
+library('Asgard')
 Final.combinations<-TopCombination(Drug.combination=Drug.combinations,
                    Combination.FDR=0.1,
                    Min.combination.score=1
