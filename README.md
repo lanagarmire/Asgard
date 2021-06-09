@@ -220,7 +220,7 @@ for (i in 1:length(SC.list)) {
     }
 
 #Change sample names
-sample<-SC.data@meta.data$sample
+sample<-SC.integrated@meta.data$sample
 sample[which(sample=="Ind5")]<-"Normal1"
 sample[which(sample=="Ind6")]<-"Normal2"
 sample[which(sample=="Ind7")]<-"Normal3"
