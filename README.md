@@ -112,16 +112,47 @@ Please use '?PrepareReference' for more help.
 #### Load single-cell RNA-seq data
 ```
 library('Seurat')
-
+#Download datasets GSE113197 and GSE123926 from GEO before running this script.
+Human Breast Cancer Epithelial Cells: [GSE123926_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE123926&format=file)
+Normal Human Breast Epithelial Cells: [GSE113197_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE113197&format=file)
 #Please replace Your_local_path with your real local folder
 
-#Case sample
-data<-read.table(file="Your_local_path/Case_Expression_Matrix.txt",header = T,check.names=FALSE)
-Case <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="CaseSample"))
+#Load normal sample Ind5 from GSE113197 dataset
+celltype<-read.table(file="Normal_celltype.txt",header = T,check.names=FALSE)
+data<-read.table(file="GSM3099847_Ind5_Expression_Matrix.txt",header = T,check.names=FALSE)
+row.names(data)<-data[,1]
+data<-data[,-1]
+celltype2<-subset(celltype,sample=="Ind5" & celltype %in% c("Luminal_L2_epithelial_cells","Luminal_L1.1_epithelial_cells", "Luminal_L1.2_epithelial_cells", "Basal_epithelial_cells"))
+common <- intersect(colnames(data), rownames(celltype2))
+data<-data[,common]
+Epithelial2 <- CreateSeuratObject(counts = data, project = "Epithelial", min.cells = 3, min.features = 200,meta.data=data.frame(celltype2,cell=colnames(data),type="Normal"))
 
-#Control sample
-data<-read.table(file="Your_local_path/Control_Expression_Matrix.txt",header = T,check.names=FALSE)
-Control <- CreateSeuratObject(counts = data, project = "Demo", min.cells = 3, min.features = 200,meta.data=data.frame(cell=colnames(data),sample="ControlSample"))
+#Load normal sample Ind6 from GSE113197 dataset
+data<-read.table(file="GSM3099848_Ind6_Expression_Matrix.txt",header = T,check.names=FALSE)
+row.names(data)<-data[,1]
+data<-data[,-1]
+celltype3<-subset(celltype,sample=="Ind6" & celltype %in% c("Luminal_L2_epithelial_cells","Luminal_L1.1_epithelial_cells", "Luminal_L1.2_epithelial_cells", "Basal_epithelial_cells"))
+common <- intersect(colnames(data), rownames(celltype3))
+data<-data[,common]
+Epithelial3 <- CreateSeuratObject(counts = data, project = "Epithelial", min.cells = 3, min.features = 200,meta.data=data.frame(celltype3,cell=colnames(data),type="Normal"))
+
+#Load normal sample Ind7 from GSE113197 dataset
+data<-read.table(file="GSM3099849_Ind7_Expression_Matrix.txt",header = T,check.names=FALSE)
+row.names(data)<-data[,1]
+data<-data[,-1]
+celltype4<-subset(celltype,sample=="Ind7" & celltype %in% c("Luminal_L2_epithelial_cells","Luminal_L1.1_epithelial_cells", "Luminal_L1.2_epithelial_cells", "Basal_epithelial_cells"))
+common <- intersect(colnames(data), rownames(celltype4))
+data<-data[,common]
+Epithelial4 <- CreateSeuratObject(counts = data, project = "Epithelial", min.cells = 3, min.features = 200,meta.data=data.frame(celltype4,cell=colnames(data),type="Normal"))
+
+#Load cancer sample PDX110 from GSE123926 dataset
+TNBC_PDX.data<- Read10X(data.dir = "GSM3516947_PDX110")
+TNBC.PDX2 <- CreateSeuratObject(counts = TNBC_PDX.data, project = "TNBC", min.cells = 3, min.features = 200,meta.data=data.frame(row.names=colnames(TNBC_PDX.data),cell=colnames(TNBC_PDX.data),sample="PDX-110",type="TNBC.PDX"))
+
+#Load cancer sample PDX322 from GSE123926 dataset
+TNBC_PDX.data<- Read10X(data.dir = "GSM3516948_PDX322")
+TNBC.PDX3 <- CreateSeuratObject(counts = TNBC_PDX.data, project = "TNBC", min.cells = 3, min.features = 200,meta.data=data.frame(row.names=colnames(TNBC_PDX.data),cell=colnames(TNBC_PDX.data),sample="PDX-332",type="TNBC.PDX"))
+
 
 ```
 - Case_Expression_Matrix.txt and Control_Expression_Matrix.txt are single-cell gene expression matrix files that you want to use for analysis. 
