@@ -110,12 +110,11 @@ Please use '?PrepareReference' for more help.
 ## Drug Repurposing
 #### Step 1
 #### Load single-cell RNA-seq data
+##### Download datasets GSE113197 and GSE123926 from GEO before running this script.
+Human Breast Cancer Epithelial Cells (GSE123926): [GSE123926_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE123926&format=file)
+Normal Human Breast Epithelial Cells (GSE113197): [GSE113197_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE113197&format=file)
 ```
 library('Seurat')
-#Download datasets GSE113197 and GSE123926 from GEO before running this script.
-Human Breast Cancer Epithelial Cells: [GSE123926_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE123926&format=file)
-Normal Human Breast Epithelial Cells: [GSE113197_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE113197&format=file)
-#Please replace Your_local_path with your real local folder
 
 #Load normal sample Ind5 from GSE113197 dataset
 celltype<-read.table(file="Normal_celltype.txt",header = T,check.names=FALSE)
