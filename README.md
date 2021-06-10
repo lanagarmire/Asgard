@@ -310,7 +310,6 @@ Use '?GetDrug' for more help
 #### Drug combination analysis
 ```
 library('Asgard')
-library('Seurat')
 
 #Please replace Your_local_path with your real local folder
 
