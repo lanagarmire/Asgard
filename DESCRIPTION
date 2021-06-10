@@ -1,6 +1,6 @@
 Package: Asgard
 Type: Package
-Title: A Single-cell Guided pipeline for Accurate Repurposing of Drugs
+Title: A Single-cell Guided pipeline to Aid Repurposition of Drugs
 Version: 1.0.0
 Author: Bing He [aut], Lana Garmire [aut, cre]
 Maintainer: Bing He <hbing@med.umich.edu>
