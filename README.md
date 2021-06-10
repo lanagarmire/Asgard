@@ -1,4 +1,4 @@
-## Asgard: A Single-cell Guided pipeline to Aid Repurposition Repurposing of Drugs 
+## Asgard: A Single-cell Guided pipeline to Aid Repurposition of Drugs 
 Using scRNA-seq data, Asgard repurposes mono-drugs for every single cell population and predicts personalized drug combinations to address the cellular heterogeneity of patients. 
 ## System Requirements
 ### Hardware requirements
