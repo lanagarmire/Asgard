@@ -12,18 +12,24 @@ CentOS Linux 7
 ```
 #### R package dependencies
 ```
+cmapR
+
+```
+
+#### Suggested R packages that help analysis
+```
 Seurat
 limma
-cmapR
 SingleR
 celldex
+
 ```
 ## Installation
 #### Install devtools if you don't have it
 ```
 install.packages('devtools')
 ```
-#### Install dependency packages
+#### Install suggested packages
 ```
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
