@@ -331,7 +331,6 @@ Please use '?DrugCombination' for more help.
 #### Select mono-drug therapies
 ```
 library('Asgard')
-library('Seurat')
 
 Final.drugs<-TopDrug(SC.integrated=SC.data,
                    Drug.data=Drug.ident.res,
