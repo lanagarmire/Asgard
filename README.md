@@ -193,6 +193,7 @@ for (i in 1:length(SC.list)) {
     ##Cell Type Annotation, set by.CellType=TRUE if you want to annotate cell  type.
     by.CellType=FALSE
     if(by.CellType == TRUE){
+     library('SingleR')
      data <- as.matrix(SC.integrated@assays$RNA@data)
      hpca.se <- HumanPrimaryCellAtlasData()
      pred.hpca <- SingleR(test = data, ref = hpca.se, assay.type.test=1, labels = hpca.se$label.main)
