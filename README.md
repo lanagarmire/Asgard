@@ -268,15 +268,13 @@ for(i in unique(SC.integrated@meta.data$celltype)){
     expr <- new_expr
     bad <- which(rowSums(expr>0)<3)
     expr <- expr[-bad,]
-    group <- new_sample$type
-    dge <- DGEList(counts=expr, group=group)
-    group_edgeR <- factor(group,levels = c("Control","Case"))
-    design <- model.matrix(~ group_edgeR)
-    dge <- estimateDisp(dge, design = design)
-    fit <- glmFit(dge, design)
-    res <- glmLRT(fit)
-    C_data <- res$table
-    C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$logFC,adj.P.Val=p.adjust(C_data$PValue,method = "BH"),P.Value=C_data$PValue)
+    mm <- model.matrix(~0 + type, data = new_sample)
+    fit <- lmFit(expr, mm)
+    contr <- makeContrasts(typeCase - typeControl, levels = colnames(coef(fit)))
+    tmp <- contrasts.fit(fit, contrasts = contr)
+    tmp <- eBayes(tmp)
+    C_data <- topTable(tmp, sort.by = "P",n = nrow(tmp))
+    C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$t,adj.P.Val=C_data$adj.P.Val,P.Value=C_data$P.Value)
     Gene.list[[i]] <- C_data_for_drug
     C_names <- c(C_names,i)
      }
