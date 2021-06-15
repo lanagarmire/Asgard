@@ -254,29 +254,31 @@ min.cells=3 # The minimum number of cells for a cell type. A cell type is omitte
 Gene.list <- list()
 C_names <- NULL
 for(i in unique(SC.integrated@meta.data$celltype)){
-     Idents(SC.integrated) <- "celltype"
-     c_cells <- subset(SC.integrated, celltype == i)
-     Idents(c_cells) <- "type"
-     Samples=c_cells@meta.data
-     Controlsample <- row.names(subset(Samples,sample %in% Control))
-     Casesample <- row.names(subset(Samples,sample %in% Case))
-     if(length(Controlsample)>min.cells & length(Casesample)>min.cells){
-      expr <- as.matrix(c_cells@assays$RNA@data)
-      new_expr <- as.matrix(expr[,c(Casesample,Controlsample)])
-      new_sample <- data.frame(Samples=c(Casesample,Controlsample),type=c(rep("Case",length(Casesample)),rep("Control",length(Controlsample))))
-      row.names(new_sample) <- paste(new_sample$Samples,row.names(new_sample),sep="_")
-      expr <- new_expr
-      bad <- which(rowSums(expr>0)<3)
-      expr <- expr[-bad,]
-      mm <- model.matrix(~0 + type, data = new_sample)
-      fit <- lmFit(expr, mm)
-      contr <- makeContrasts(typeCase - typeControl, levels = colnames(coef(fit)))
-      tmp <- contrasts.fit(fit, contrasts = contr)
-      tmp <- eBayes(tmp)
-      C_data <- topTable(tmp, sort.by = "P",n = nrow(tmp))
-      Gene.list[[i]] <- C_data
-      C_names <- c(C_names,i)
-      C_data_for_drug <- data.frame(geneSymbol=row.names(C_data),score=C_data$t)
+  Idents(SC.integrated) <- "celltype"
+  c_cells <- subset(SC.integrated, celltype == i)
+  Idents(c_cells) <- "type"
+  Samples=c_cells@meta.data
+  Controlsample <- row.names(subset(Samples,sample %in% Control))
+  Casesample <- row.names(subset(Samples,sample %in% Case))
+  if(length(Controlsample)>min.cells & length(Casesample)>min.cells){
+    expr <- as.matrix(c_cells@assays$RNA@data)
+    new_expr <- as.matrix(expr[,c(Casesample,Controlsample)])
+    new_sample <- data.frame(Samples=c(Casesample,Controlsample),type=c(rep("Case",length(Casesample)),rep("Control",length(Controlsample))))
+    row.names(new_sample) <- paste(new_sample$Samples,row.names(new_sample),sep="_")
+    expr <- new_expr
+    bad <- which(rowSums(expr>0)<3)
+    expr <- expr[-bad,]
+    group <- new_sample$type
+    dge <- DGEList(counts=expr, group=group)
+    group_edgeR <- factor(group,levels = c("Control","Case"))
+    design <- model.matrix(~ group_edgeR)
+    dge <- estimateDisp(dge, design = design)
+    fit <- glmFit(dge, design)
+    res <- glmLRT(fit)
+    C_data <- res$table
+    C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$logFC,adj.P.Val=p.adjust(C_data$PValue,method = "BH"),P.Value=C_data$PValue)
+    Gene.list[[i]] <- C_data_for_drug
+    C_names <- c(C_names,i)
      }
 }
 names(Gene.list) <- C_names
