@@ -23,7 +23,7 @@ celldex
 ```
 install.packages('devtools')
 ```
-#### Install dependency packages
+#### Install recommended packages
 ```
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
