@@ -33,7 +33,7 @@ GetDrug = function(gene.data = NULL,
   }
   res.list <- list()
   for(ci in 1:length(names(gene.data))){
-      query.data <- data.frame(geneSymbol=row.names(gene.data[[ci]]),score=gene.data[[ci]]$t)
+      query.data <- data.frame(geneSymbol=row.names(gene.data[[ci]]),score=gene.data[[ci]]$score)
       cmap.drug.rank = drug.ref.profiles$drug.rank.matrix
       e1 = simpleError("Did not find the column named 'geneSymbol' in query data that contains the gene symbols in it.")
       e2 = simpleError("Did not find the column named 'score' in query data that contains the test statistics or any values that you would like to rank the genes.")
@@ -80,7 +80,7 @@ GetDrug = function(gene.data = NULL,
 
       drug.pvals = drug.pvals[order(drug.pvals$pval),]
       drugs = rownames(drug.pvals)
-      drug.pvals$Drug.name = gsub("_.*","",drugs)
+      drug.pvals$Drug.name = gsub("_BRD-.*","",drugs)
       drug.pvals$Drug.id = gsub(".*_","",drugs)
       rownames(drug.pvals) = NULL
       drug.pvals = drug.pvals[,c(3,4,1)]

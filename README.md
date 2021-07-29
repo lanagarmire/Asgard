@@ -1,4 +1,4 @@
-## Asgard: A Single-cell Guided pipeline to Aid Repurposition of Drugs 
+## Asgard: A Single-cell Guided pipeline for Accurate Repurposing of Drugs 
 Using scRNA-seq data, Asgard repurposes mono-drugs for every single cell population and predicts personalized drug combinations to address the cellular heterogeneity of patients. 
 ## System Requirements
 ### Hardware requirements
@@ -12,24 +12,18 @@ CentOS Linux 7
 ```
 #### R package dependencies
 ```
-cmapR
-
-```
-
-#### Suggested R packages that help analysis
-```
 Seurat
 limma
+cmapR
 SingleR
 celldex
-
 ```
 ## Installation
 #### Install devtools if you don't have it
 ```
 install.packages('devtools')
 ```
-#### Install suggested packages
+#### Install dependency packages
 ```
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -199,8 +193,7 @@ for (i in 1:length(SC.list)) {
     ##Cell Type Annotation, set by.CellType=TRUE if you want to annotate cell  type.
     by.CellType=FALSE
     if(by.CellType == TRUE){
-     library('SingleR')
-     data <- SC.integrated@assays$RNA@data
+     data <- as.matrix(SC.integrated@assays$RNA@data)
      hpca.se <- HumanPrimaryCellAtlasData()
      pred.hpca <- SingleR(test = data, ref = hpca.se, assay.type.test=1, labels = hpca.se$label.main)
      cell.label <- data.frame(row.names = row.names(pred.hpca),celltype=pred.hpca$labels)
@@ -227,14 +220,14 @@ for (i in 1:length(SC.list)) {
     }
 
 #Change sample names
-sample<-SC.integrated@meta.data$sample
+sample<-SC.data@meta.data$sample
 sample[which(sample=="Ind5")]<-"Normal1"
 sample[which(sample=="Ind6")]<-"Normal2"
 sample[which(sample=="Ind7")]<-"Normal3"
-SC.integrated@meta.data$sample<-sample
+SC.data@meta.data$sample<-sample
 
 #Visualize alignment result
-DimPlot(SC.integrated, reduction = "umap", split.by = "sample",group.by = "celltype")
+DimPlot(SC.data, reduction = "umap", split.by = "sample",group.by = "celltype")
 ```
 #### Step 3
 #### Single-cell comparison
@@ -250,33 +243,32 @@ Control=c("Normal1","Normal2","Normal3")
 library('limma')
 DefaultAssay(SC.integrated) <- "RNA"
 set.seed(123456)
-min.cells=3 # The minimum number of cells for a cell type. A cell type is omitted if it has less cells than the minimum number.
 Gene.list <- list()
 C_names <- NULL
 for(i in unique(SC.integrated@meta.data$celltype)){
-  Idents(SC.integrated) <- "celltype"
-  c_cells <- subset(SC.integrated, celltype == i)
-  Idents(c_cells) <- "type"
-  Samples=c_cells@meta.data
-  Controlsample <- row.names(subset(Samples,sample %in% Control))
-  Casesample <- row.names(subset(Samples,sample %in% Case))
-  if(length(Controlsample)>min.cells & length(Casesample)>min.cells){
-    expr <- as.matrix(c_cells@assays$RNA@data)
-    new_expr <- as.matrix(expr[,c(Casesample,Controlsample)])
-    new_sample <- data.frame(Samples=c(Casesample,Controlsample),type=c(rep("Case",length(Casesample)),rep("Control",length(Controlsample))))
-    row.names(new_sample) <- paste(new_sample$Samples,row.names(new_sample),sep="_")
-    expr <- new_expr
-    bad <- which(rowSums(expr>0)<3)
-    expr <- expr[-bad,]
-    mm <- model.matrix(~0 + type, data = new_sample)
-    fit <- lmFit(expr, mm)
-    contr <- makeContrasts(typeCase - typeControl, levels = colnames(coef(fit)))
-    tmp <- contrasts.fit(fit, contrasts = contr)
-    tmp <- eBayes(tmp)
-    C_data <- topTable(tmp, sort.by = "P",n = nrow(tmp))
-    C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$t,adj.P.Val=C_data$adj.P.Val,P.Value=C_data$P.Value)
-    Gene.list[[i]] <- C_data_for_drug
-    C_names <- c(C_names,i)
+     Idents(SC.integrated) <- "celltype"
+     c_cells <- subset(SC.integrated, celltype == i)
+     Idents(c_cells) <- "type"
+     Samples=c_cells@meta.data
+     Controlsample <- row.names(subset(Samples,sample %in% Control))
+     Casesample <- row.names(subset(Samples,sample %in% Case))
+     if(length(Controlsample)>min.cells & length(Casesample)>min.cells){
+      expr <- as.matrix(c_cells@assays$RNA@data)
+      new_expr <- as.matrix(expr[,c(Casesample,Controlsample)])
+      new_sample <- data.frame(Samples=c(Casesample,Controlsample),type=c(rep("Case",length(Casesample)),rep("Control",length(Controlsample))))
+      row.names(new_sample) <- paste(new_sample$Samples,row.names(new_sample),sep="_")
+      expr <- new_expr
+      bad <- which(rowSums(expr>0)<3)
+      expr <- expr[-bad,]
+      mm <- model.matrix(~0 + type, data = new_sample)
+      fit <- lmFit(expr, mm)
+      contr <- makeContrasts(typeCase - typeControl, levels = colnames(coef(fit)))
+      tmp <- contrasts.fit(fit, contrasts = contr)
+      tmp <- eBayes(tmp)
+      C_data <- topTable(tmp, sort.by = "P",n = nrow(tmp))
+      Gene.list[[i]] <- C_data
+      C_names <- c(C_names,i)
+      C_data_for_drug <- data.frame(geneSymbol=row.names(C_data),score=C_data$t)
      }
 }
 names(Gene.list) <- C_names
@@ -310,12 +302,13 @@ Use '?GetDrug' for more help
 #### Drug combination analysis
 ```
 library('Asgard')
+library('Seurat')
 
 #Please replace Your_local_path with your real local folder
 
 GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 GSE70138.gctx.path="Your_local_path/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
-Drug.combinations<-DrugCombination(SC.integrated=SC.integrated,
+Drug.combinations<-DrugCombination(SC.integrated=SC.data,
                       Gene.data=Gene.list,
                       Drug.data=Drug.ident.res,
                       Drug.FDR=0.1,
@@ -331,6 +324,7 @@ Please use '?DrugCombination' for more help.
 #### Select mono-drug therapies
 ```
 library('Asgard')
+library('Seurat')
 
 Final.drugs<-TopDrug(SC.integrated=SC.data,
                    Drug.data=Drug.ident.res,

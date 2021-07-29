@@ -1,23 +1,23 @@
 #' @title Treatment Efficacy of the Drug.
-#' @description  It evaluates treatment efficacy to identify drug combinations that can best reverse the target genes’ expression in diseased cells in case samples.
-#' @details This function evaluates treatment efficacy and ranks drug combinations using therapeutics score, which integrates gene responses to multiple drugs, the proportion of genes, and cells treated by combined drugs.
-#' @param SC.integrated A Seurat object of aligned single cells.
+#' @description  It evaluates treatment efficacy to identify drug that can best reverse the target genes’ expression in diseased cells in case samples.
+#' @details This function evaluates treatment efficacy and ranks drugs using therapeutics score, which integrates gene responses to multiple drugs, the proportion of genes, and cells treated by drugs.
+#' @param SC.integrated A Seurat object of aligned single cells from Seurat.
 #' @param Gene.data A list of differnential gene expression profiles for every cell type. It's from GetGene function.
 #' @param Drug.data A list of mono-drugs for every cell type. It's from GetDrug function.
 #' @param Drug.FDR The FDR threshold to select drug. The default value is 0.1.
 #' @param FDA.drug.only logical; if TRUE, will only return FDA-approved drugs.
-#' @param Combined.drugs The number of drugs in a combination. The default value is 2.
 #' @param GSE92742.gctx The local path and the name of the gctx file from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).
 #' @param GSE70138.gctx The local path and the name of the gctx file from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).
 #' @param Case A vector contains names of case samples.
 #' @param Tissue Reference tissue. Usually it's same with the drug reference tissue.
-#' @return A data frame of drug combinations with therapeutics scores and FDR.
+#' @return A data frame of drug combinations with therapeutics scores.
 #' @export
 #' @import cmapR
 
 
 DrugScore <- function(SC.integrated=SC.data,
                             Gene.data=Gene.list,
+                            Cell.type=NULL,
                             Drug.data=Drug.ident.res,
                             FDA.drug.only=TRUE,
                             GSE92742.gctx=NULL,
@@ -25,23 +25,29 @@ DrugScore <- function(SC.integrated=SC.data,
                             Case=NULL,
                             Tissue="breast"
 ){
-    data <- SC.integrated
-
+    if(length(Cell.type)>0){
+      Cell.type=intersect(Cell.type, unique(SC.integrated@meta.data$celltype))
+      SC.integrated=subset(SC.integrated, celltype %in% Cell.type)
+      Drug.data=Drug.data[Cell.type]
+      Gene.data=Gene.data[Cell.type]
+    }
     ##Cell proportion
     cells <- SC.integrated@meta.data
     if(length(Case)>0){
-    cells <- subset(cells,sample %in% Case)
+      cells <- subset(cells,sample %in% Case)
+      SC.integrated=subset(SC.integrated, sample %in% Case)
     }
     cells <- cells$celltype
     cell.count <- table(cells)
     cell.count <- cell.count[which(cell.count>3)]
     cells.freq <- round(100*cell.count/length(cells),2)
+    cells.freq.rank <- rank(as.vector(cells.freq))
 
     ##Load drug data
     Drug.list <- data.frame()
     for(i in names(Drug.data)){
       Cd <- Drug.data[[i]]
-      Cd <- subset(Cd, FDR<Drug.FDR)
+      Cd <- Cd[!duplicated(Cd$Drug.name),]
       Drugs <- Cd$Drug.name
       if(FDA.drug.only==TRUE){
       Drugs <- intersect(Drugs,FDA.drug)
@@ -49,24 +55,26 @@ DrugScore <- function(SC.integrated=SC.data,
       if(length(Drugs)>0){
       Cd <- subset(Cd, Drug.name %in% Drugs)
       FDRs <- Cd$FDR
-      temp <- data.frame(Drug=Drugs,Cluster=i,Size=cells.freq[i],FDR=FDRs,row.names = NULL)
+      Pvalue <- Cd$P.value
+      temp <- data.frame(Drug=Drugs,Cluster=i,Size=cells.freq[i],P.value=Pvalue,FDR=FDRs,row.names = NULL)
       Drug.list <- rbind(Drug.list,temp)
       }
     }
     Drug.list <- unique(Drug.list)
-    Drug.coverage <- tapply(Drug.list$Size, Drug.list$Drug,sum)
-    Drug.combinations <- combn(unique(Drug.list$Drug),Combined.drugs)
-    Select.combnation <- function(Drugs){
-      temp.list <- subset(Drug.list,Drug %in% Drugs)
-      temp.list <- unique(temp.list[,2:3])
-      temp.size <- sum(temp.list$Size)
-      return(temp.size)
+    Drug.list$P.value <- Drug.list$P.value
+    Drug.list$w.size <- Drug.list$Size*(-log10(Drug.list$FDR))
+    Drug.list[is.na(Drug.list)] <- 0
+    Drug.coverage <- tapply(Drug.list$w.size, Drug.list$Drug,sum)
+    C.Drugs <- rownames(Drug.coverage)
+    
+    ##Combine P value
+    if(length(unique(names(Drug.data)))>1){
+       Combined.Pvalue <- tapply(Drug.list$P.value, Drug.list$Drug, CombineP)
+    }else{
+      Combined.Pvalue <- Drug.list$P.value
+      names(Combined.Pvalue) <- Drug.list$Drug
     }
-    label<-apply(Drug.combinations,2,Select.combnation)
-    Selected.Drug.combinations <- Drug.combinations[,which(label>0)]
-    Selected.Drug.combinations.coverage <- label[which(label>0)]
-    C.Drugs <- unique(as.vector(Selected.Drug.combinations))
-
+  
     ##Cell line information
     cells <- subset(cell_data,primary_site == Tissue)$cell_id
 
@@ -107,7 +115,7 @@ DrugScore <- function(SC.integrated=SC.data,
     data <- data[,-1]
     data_infor <- rbind(data_infor1,data_infor2)
 
-    ##Combination score
+    ##Drug score
     D.genes <- list()
     for(i in names(Gene.data)){
       Cd <- Gene.data[[i]]
@@ -120,9 +128,9 @@ DrugScore <- function(SC.integrated=SC.data,
     for(i in names(Gene.data)){
       Cd <- Gene.data[[i]]
       if(nrow(Gene.expression)==0){
-        Gene.expression <- data.frame(Score=Cd[D.genes,"t"])
+        Gene.expression <- data.frame(Score=Cd[D.genes,"score"])
       }else{
-      Gene.expression.temp <- data.frame(Score=Cd[D.genes,"t"])
+      Gene.expression.temp <- data.frame(Score=Cd[D.genes,"score"])
       Gene.expression <- cbind(Gene.expression,Gene.expression.temp)
       }
     }
@@ -135,59 +143,23 @@ DrugScore <- function(SC.integrated=SC.data,
     for(Drug in C.Drugs){
       D.genes.treated <- NULL
       drug.treatments <- subset(data_infor,pert_iname == Drug)$sig_id
-      drug.responses <- data[,drug.treatments]
-      drug.responses.mean <- apply(drug.responses,1,mean)
+      if(length(drug.treatments)>1){
+        drug.responses <- data[,drug.treatments]
+        drug.responses.mean <- apply(drug.responses,1,mean)
+      }else{
+        drug.responses <- data[,drug.treatments]
+        drug.responses.mean <- drug.responses
+      }
       D.D.genes <- intersect(names(D.gene.expression),names(drug.responses.mean))
       D.genes.treated <- -D.gene.expression[D.D.genes]*drug.responses.mean[D.D.genes]
       D.genes.treated <- D.genes.treated[which(D.genes.treated>0)]
-      D.genes.treated <- D.genes.treated
       Mean.treated <- mean(D.genes.treated)
       Ratio.treated <- length(D.genes.treated)/length(D.D.genes)
       Coverage.treated <- Drug.coverage[Drug]/100
-      Treated.score <- (Mean.treated*Ratio.treated*Coverage.treated)^(1/3)
+      Treated.score <- (Ratio.treated*Coverage.treated)
       Single.treated.score.list <- c(Single.treated.score.list,Treated.score)
     }
-    Combination.treated.score <- function(Drugs){
-      D.genes.treated<-NULL
-      for(drug in Drugs){
-        drug.treatments <- subset(data_infor,pert_iname == drug)$sig_id
-        drug.responses <- data[,drug.treatments]
-        drug.responses.mean <- apply(drug.responses,1,mean)
-        D.D.genes <- intersect(names(D.gene.expression),names(drug.responses.mean))
-        D.genes.treated.temp <- -D.gene.expression[D.D.genes]*drug.responses.mean[D.D.genes]
-        D.genes.treated <- cbind(D.genes.treated,D.genes.treated.temp)
-      }
-      remove <- which(rowSums(D.genes.treated<0)==length(Drugs))
-      D.genes.combination <- D.genes.treated[-remove,]
-      scores <- apply(D.genes.combination,1,mean)
-      Ratio.treated <- length(which(scores>0))/length(D.D.genes)
-      temp.scores <- scores*Ratio.treated
-      return(temp.scores)
-    }
-    Score.list <- apply(Selected.Drug.combinations, 2, Combination.treated.score)
-    ref.score <- unlist(Score.list)
-	P.value <- function(Score) {
-	  if(length(Score)>1 && length(ref.score)>1){
-	  temp <- ks.test(Score, ref.score)
-	  p.value <- temp$p.value
-	  return(p.value)
-	  }else{
-		return(1)
-	  }
-	}
-    pvalues <- unlist(suppressWarnings(lapply(Score.list, P.value)))
-    combination.scores <- unlist(suppressWarnings(lapply(Score.list,mean)))
-    Combination.table <- as.data.frame(t(Selected.Drug.combinations))
-    for(d in 1:Combined.drugs){
-     Combination.table <- cbind(Combination.table, Single.treated.score.list[Combination.table[,d]])
-    }
-    neg.combination.scores <- which(combination.scores<0)
-    combination.scores[neg.combination.scores] <- -combination.scores[neg.combination.scores]
-    Combination.table$Combination.therapeutic.score <- (Selected.Drug.combinations.coverage*combination.scores/100)^(1/3)
-    Combination.table$Combination.therapeutic.score[neg.combination.scores] <- -Combination.table$Combination.therapeutic.score[neg.combination.scores]
-    Combination.table$P.value <- pvalues
-    Combination.table$FDR <- p.adjust(pvalues, method = "BH")
-    colnames(Combination.table)[1:Combined.drugs] <- paste0("Drug",1:Combined.drugs)
-    colnames(Combination.table)[(Combined.drugs+1):(2*Combined.drugs)] <- paste0("Drug",1:Combined.drugs,".therapeutic.score")
-    return(Combination.table)
+    Res.table <- data.frame(Drug.therapeutic.score=Single.treated.score.list[C.Drugs],P.value=Combined.Pvalue[C.Drugs],FDR=p.adjust(Combined.Pvalue[C.Drugs],method = "BH"))
+    return(Res.table)
+
 }
