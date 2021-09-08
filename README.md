@@ -10,7 +10,7 @@ The package has been tested on the following systems:
 Windows 10
 CentOS Linux 7
 ```
-#### R package dependencies
+#### R package recommended
 ```
 Seurat
 limma
@@ -93,13 +93,13 @@ library('Asgard')
 
 #Please replace Your_local_path with your real local folder
 
-PrepareReference(cell.info="Your_local_path/GSE70138_Broad_LINCS_cell_info_2017-04-28.txt",
-                 gene.info="Your_local_path/GSE70138_Broad_LINCS_gene_info_2017-03-06.txt",
-                 GSE70138.sig.info = "Your_local_path/GSE70138_Broad_LINCS_sig_info_2017-03-06.txt",
-                 GSE92742.sig.info = "Your_local_path/GSE92742_Broad_LINCS_sig_info.txt",
-                 GSE70138.gctx = "Your_local_path/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx",
-                 GSE92742.gctx = "Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx",
-                 Output.Dir = "Your_local_path/DrugReference/"
+PrepareReference(cell.info="GSE70138_Broad_LINCS_cell_info_2017-04-28.txt",
+                 gene.info="GSE70138_Broad_LINCS_gene_info_2017-03-06.txt",
+                 GSE70138.sig.info = "GSE70138_Broad_LINCS_sig_info_2017-03-06.txt",
+                 GSE92742.sig.info = "GSE92742_Broad_LINCS_sig_info.txt",
+                 GSE70138.gctx = "GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx",
+                 GSE92742.gctx = "GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx",
+                 Output.Dir = "DrugReference/"
 )
 
 #Note: the file names here maybe different after unzipping.
@@ -280,12 +280,10 @@ names(Gene.list) <- C_names
 ```
 library('Asgard')
 
-#Please replace Your_local_path with your real local folder
-
-#Load tissue specific drug reference produced by PrepareReference function as mentioned above
-my_gene_info<-read.table(file="Your_local_path/DrugReference/breast_gene_info.txt",sep="\t",header = T,quote = "")
-my_drug_info<-read.table(file="Your_local_path/DrugReference/breast_drug_info.txt",sep="\t",header = T,quote = "")
-drug.ref.profiles = GetDrugRef(drug.response.path = 'Your_local_path/DrugReference/breast_rankMatrix.txt',
+#Load tissue specific drug reference produced by PrepareReference function as mentioned above. Please select proper tissue accroding to the disease.
+my_gene_info<-read.table(file="DrugReference/breast_gene_info.txt",sep="\t",header = T,quote = "")
+my_drug_info<-read.table(file="DrugReference/breast_drug_info.txt",sep="\t",header = T,quote = "")
+drug.ref.profiles = GetDrugRef(drug.response.path = 'DrugReference/breast_rankMatrix.txt',
                                probe.to.genes = my_gene_info, 
                                drug.info = my_drug_info)
 
@@ -298,16 +296,58 @@ Drug.ident.res = GetDrug(gene.data = Gene.list,
                        
 ```
 Use '?GetDrug' for more help
+
 #### Step 5
+#### Estimation of drug score
+```
+library('Asgard')
+library('Seurat')
+
+GSE92742.gctx.path="GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
+GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328.gctx"
+Tissue="breast"
+Drug.score<-DrugScore(SC.integrated=SC.data,
+                     Gene.data=Gene.list,
+                     Cell.type=NULL,
+                     Drug.data=Drug.ident.res,
+                     FDA.drug.only=TRUE,
+                     Case=Case,
+                     Tissue="breast",
+                     GSE92742.gctx=GSE92742.gctx.path,
+                     GSE70138.gctx=GSE70138.gctx.path)
+                       
+```
+Use '?DrugScore' for more help
+
+#### Step 6
+#### Select mono-drug therapies
+```
+library('Asgard')
+library('Seurat')
+
+#select drug using drug socre
+library(Hmisc)
+Final.drugs<-subset(Drug.score,Drug.therapeutic.score>quantile(Drug.score$Drug.therapeutic.score, 0.99,na.rm=T) & FDR <0.05)
+)
+
+#select drug for individual clusters
+Final.drugs<-TopDrug(SC.integrated=SC.data,
+                   Drug.data=Drug.ident.res,
+                   Drug.FDR=0.1,
+                   FDA.drug.only=TRUE,
+                   Case=Case.samples,
+                   DrugScore=FALSE
+)
+
+```
+#### Step 7 (optional)
 #### Drug combination analysis
 ```
 library('Asgard')
 library('Seurat')
 
-#Please replace Your_local_path with your real local folder
-
-GSE92742.gctx.path="Your_local_path/GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
-GSE70138.gctx.path="Your_local_path/GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
+GSE92742.gctx.path="GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
+GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
 Drug.combinations<-DrugCombination(SC.integrated=SC.data,
                       Gene.data=Gene.list,
                       Drug.data=Drug.ident.res,
@@ -320,19 +360,6 @@ Drug.combinations<-DrugCombination(SC.integrated=SC.data,
                       GSE70138.gctx=GSE70138.gctx.path)
 ```
 Please use '?DrugCombination' for more help.
-#### Step 6
-#### Select mono-drug therapies
-```
-library('Asgard')
-library('Seurat')
-
-Final.drugs<-TopDrug(SC.integrated=SC.data,
-                   Drug.data=Drug.ident.res,
-                   Drug.FDR=0.1,
-                   FDA.drug.only=TRUE,
-                   Case=Case.samples
-)
-```
 
 #### Select drug combination therapies
 ```
