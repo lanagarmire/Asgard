@@ -1,5 +1,5 @@
-## Asgard: A Single-cell Guided pipeline for Accurate Repurposing of Drugs 
-Using scRNA-seq data, Asgard repurposes mono-drugs for every single cell population and predicts personalized drug combinations to address the cellular heterogeneity of patients. 
+## Asgard: A Single-cell Guided pipeline to Aid Repurposing of Drugs 
+Using scRNA-seq data, Asgard repurposes drugs and predicts personalized drug combinations to address the cellular heterogeneity of patients. 
 ## System Requirements
 ### Hardware requirements
 Asgard package requires only a standard computer with enough RAM (>64GB) to support the in-memory operations.
