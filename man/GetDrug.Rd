@@ -28,7 +28,7 @@ GetDrug(
 A list of mono-drugs for every cell type.
 }
 \description{
-Identify mono-drug therapy for every cell type.
+It identify mono-drug therapy for every cell type.
 }
 \details{
 This function allows user to use the differential expression data of every case cell type to query against reference drug response profiles.This function is a reverised version of drug.identification from DrInsight package.

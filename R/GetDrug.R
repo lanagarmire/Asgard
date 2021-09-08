@@ -1,5 +1,5 @@
 #' @title Mono-drug Repurposing.
-#' @description  Identify mono-drug therapy for every cell type.
+#' @description  It identify mono-drug therapy for every cell type.
 #' @details This function allows user to use the differential expression data of every case cell type to query against reference drug response profiles.This function is a reverised version of drug.identification from DrInsight package.
 #' @param drug.ref.profiles A list contains tissue specific drug reference Profiles from GetDrugRef function.
 #' @param repurposing.unit The parameter of either "treatment" or "drug", which indicates if user want the function to test drug repurposing p value at treatment level or drug level. The default is "treatment", which treats the drug data from different cell lines separately.

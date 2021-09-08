@@ -2,7 +2,7 @@
 % Please edit documentation in R/DrugScore.R
 \name{DrugScore}
 \alias{DrugScore}
-\title{Treatment Efficacy of the Drug.}
+\title{Drug Score}
 \usage{
 DrugScore(
   SC.integrated = SC.data,
@@ -21,25 +21,25 @@ DrugScore(
 
 \item{Gene.data}{A list of differnential gene expression profiles for every cell type. It's from GetGene function.}
 
-\item{Drug.data}{A list of mono-drugs for every cell type. It's from GetDrug function.}
+\item{Cell.type}{Select which clusters (cell types) to be used for drug score estimation. By default, it uses all clusters.}
 
-\item{FDA.drug.only}{logical; if TRUE, will only return FDA-approved drugs.}
+\item{Drug.data}{A list of mono-drugs for every cluster. It's from GetDrug function.}
 
-\item{GSE92742.gctx}{The local path and the name of the gctx file from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).}
+\item{FDA.drug.only}{logical; if TRUE, will only return FDA-approved drugs, else, will return all inputted drugs/compounds}
 
-\item{GSE70138.gctx}{The local path and the name of the gctx file from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).}
+\item{GSE92742.gctx}{The gctx file contains drug responses from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).}
 
-\item{Case}{A vector contains names of case samples.}
+\item{GSE70138.gctx}{The gctx file contains drug responses from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).}
 
-\item{Tissue}{Reference tissue. Usually it's same with the drug reference tissue.}
+\item{Case}{A vector contains case sample names.}
 
-\item{Drug.FDR}{The FDR threshold to select drug. The default value is 0.1.}
+\item{Tissue}{Reference tissue. If one used lung_rankMatrix.txt in GetDrugRef function, then the Reference tissue is lung.}
 }
 \value{
-A data frame of drug combinations with therapeutics scores.
+A data frame of drug score, P-value and FDR.
 }
 \description{
-It evaluates treatment efficacy to identify drug that can best reverse the target genes’ expression in diseased cells in case samples.
+The drug score is a comprehensive estimation of drug therapeutic effects acrossing all or selected single cell clusters.
 }
 \details{
 This function evaluates treatment efficacy and ranks drugs using therapeutics score, which integrates gene responses to multiple drugs, the proportion of genes, and cells treated by drugs.

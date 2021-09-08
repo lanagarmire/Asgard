@@ -7,10 +7,10 @@
 #' @param Drug.FDR The FDR threshold to select drug. The default value is 0.1.
 #' @param FDA.drug.only logical; if TRUE, will only return FDA-approved drugs.
 #' @param Combined.drugs The number of drugs in a combination. The default value is 2.
-#' @param GSE92742.gctx The local path and the name of the gctx file from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).
-#' @param GSE70138.gctx The local path and the name of the gctx file from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).
+#' @param GSE92742.gctx The gctx file contains drug responses from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).
+#' @param GSE70138.gctx The gctx file contains drug responses from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).
 #' @param Case A vector contains names of case samples.
-#' @param Tissue Reference tissue. Usually it's same with the drug reference tissue.
+#' @param Tissue Reference tissue. If one used lung_rankMatrix.txt in GetDrugRef function, then the Reference tissue is lung.
 #' @return A data frame of drug combinations with therapeutics scores and FDR.
 #' @export
 #' @import cmapR
