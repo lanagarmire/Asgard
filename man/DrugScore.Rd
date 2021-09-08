@@ -2,7 +2,7 @@
 % Please edit documentation in R/DrugScore.R
 \name{DrugScore}
 \alias{DrugScore}
-\title{Drug score}
+\title{Drug Score}
 \usage{
 DrugScore(
   SC.integrated = SC.data,
@@ -17,13 +17,13 @@ DrugScore(
 )
 }
 \arguments{
-\item{SC.integrated}{A Seurat object of aligned single cells from Seurat.}
+\item{SC.integrated}{A Seurat object of aligned single cells.}
 
 \item{Gene.data}{A list of differnential gene expression profiles for every cell type. It's from GetGene function.}
 
 \item{Cell.type}{Select which clusters (cell types) to be used for drug score estimation. By default, it uses all clusters.}
 
-\item{Drug.data}{A list of mono-drugs for every cluster. It's from GetDrug function.}
+\item{Drug.data}{Drug repurosing result from GetDrug function.}
 
 \item{FDA.drug.only}{logical; if TRUE, will only return FDA-approved drugs, else, will return all inputted drugs/compounds}
 

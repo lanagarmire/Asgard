@@ -2,7 +2,7 @@
 % Please edit documentation in R/TopDrug.R
 \name{TopDrug}
 \alias{TopDrug}
-\title{Single Drug Selection.}
+\title{Single Drug Selection for Individual Clusters.}
 \usage{
 TopDrug(
   SC.integrated = SC.data,
@@ -13,9 +13,9 @@ TopDrug(
 )
 }
 \arguments{
-\item{SC.integrated}{Single-cell alignment result from Seurat.}
+\item{SC.integrated}{A Seurat object of aligned single cells.}
 
-\item{Drug.data}{Drug repurosing result from drug.ident function.}
+\item{Drug.data}{Drug repurosing result from GetDrug function.}
 
 \item{Drug.FDR}{The FDR threshold to select drug. The default value is 0.1.}
 
