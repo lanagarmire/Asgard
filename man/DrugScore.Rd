@@ -2,7 +2,7 @@
 % Please edit documentation in R/DrugScore.R
 \name{DrugScore}
 \alias{DrugScore}
-\title{Drug Score}
+\title{Drug score}
 \usage{
 DrugScore(
   SC.integrated = SC.data,
@@ -42,5 +42,5 @@ A data frame of drug score, P-value and FDR.
 The drug score is a comprehensive estimation of drug therapeutic effects acrossing all or selected single cell clusters.
 }
 \details{
-This function evaluates treatment efficacy and ranks drugs using therapeutics score, which integrates gene responses to multiple drugs, the proportion of genes, and cells treated by drugs.
+This function estimates drug treatment efficacy using therapeutics score, fisher's combined P-value and FDR.
 }
