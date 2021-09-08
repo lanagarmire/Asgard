@@ -1,10 +1,10 @@
 #' @title Drug Score
 #' @description  The drug score is a comprehensive estimation of drug therapeutic effects acrossing all or selected single cell clusters. 
-#' @details This function evaluates treatment efficacy and ranks drugs using therapeutics score, which integrates gene responses to multiple drugs, the proportion of genes, and cells treated by drugs.
-#' @param SC.integrated A Seurat object of aligned single cells from Seurat.
+#' @details This function estimates drug treatment efficacy using therapeutics score, fisher's combined P-value and FDR.
+#' @param SC.integrated A Seurat object of aligned single cells.
 #' @param Gene.data A list of differnential gene expression profiles for every cell type. It's from GetGene function.
 #' @param Cell.type Select which clusters (cell types) to be used for drug score estimation. By default, it uses all clusters.
-#' @param Drug.data A list of mono-drugs for every cluster. It's from GetDrug function.
+#' @param Drug.data Drug repurosing result from GetDrug function.
 #' @param FDA.drug.only logical; if TRUE, will only return FDA-approved drugs, else, will return all inputted drugs/compounds
 #' @param GSE92742.gctx The gctx file contains drug responses from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).
 #' @param GSE70138.gctx The gctx file contains drug responses from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).
