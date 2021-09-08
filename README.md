@@ -220,14 +220,14 @@ for (i in 1:length(SC.list)) {
     }
 
 #Change sample names
-sample<-SC.data@meta.data$sample
+sample<-SC.integrated@meta.data$sample
 sample[which(sample=="Ind5")]<-"Normal1"
 sample[which(sample=="Ind6")]<-"Normal2"
 sample[which(sample=="Ind7")]<-"Normal3"
-SC.data@meta.data$sample<-sample
+SC.integrated@meta.data$sample<-sample
 
 #Visualize alignment result
-DimPlot(SC.data, reduction = "umap", split.by = "sample",group.by = "celltype")
+DimPlot(SC.integrated, reduction = "umap", split.by = "sample",group.by = "celltype")
 ```
 #### Step 3
 #### Single-cell comparison
@@ -273,6 +273,78 @@ for(i in unique(SC.integrated@meta.data$celltype)){
 }
 names(Gene.list) <- C_names
 
+#Get differential genes from Seurat (Wilcoxon Rank Sum test)
+library('Seurat')
+DefaultAssay(SC.integrated) <- "RNA"
+set.seed(123456)
+Gene.list <- list()
+C_names <- NULL
+for(i in unique(SC.integrated@meta.data$celltype)){
+  Idents(SC.integrated) <- "celltype"
+  c_cells <- subset(SC.integrated, celltype == i)
+  Idents(c_cells) <- "type"
+  C_data <- FindMarkers(c_cells, ident.1 = "TNBC.PDX", ident.2 = "Normal")
+  C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$avg_logFC,adj.P.Val=C_data$p_val_adj,P.Value=C_data$p_val)
+  Gene.list[[i]] <- C_data_for_drug
+  C_names <- c(C_names,i)
+}
+names(Gene.list) <- C_names
+
+#Get differential genes from DESeq2 method
+library('Seurat')
+DefaultAssay(SC.integrated) <- "RNA"
+set.seed(123456)
+Gene.list <- list()
+C_names <- NULL
+for(i in unique(SC.integrated@meta.data$celltype)){
+  Idents(SC.integrated) <- "celltype"
+  c_cells <- subset(SC.integrated, celltype == i)
+  Idents(c_cells) <- "type"
+  C_data <- FindMarkers(c_cells, ident.1 = "TNBC.PDX", ident.2 = "Normal", test.use = "DESeq2")
+  C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$avg_logFC,adj.P.Val=C_data$p_val_adj,P.Value=C_data$p_val)
+  Gene.list[[i]] <- C_data_for_drug
+  C_names <- c(C_names,i)
+}
+names(Gene.list) <- C_names
+
+#Get differential genes from EdgeR
+library('edgeR')
+Case=c("PDX-110","PDX-332")
+Control=c("Normal1","Normal2","Normal3")
+DefaultAssay(SC.integrated) <- "RNA"
+set.seed(123456)
+min.cells=3 # The minimum number of cells for a cell type. A cell type is omitted if it has less cells than the minimum number.
+Gene.list <- list()
+C_names <- NULL
+for(i in unique(SC.integrated@meta.data$celltype)){
+  Idents(SC.integrated) <- "celltype"
+  c_cells <- subset(SC.integrated, celltype == i)
+  Idents(c_cells) <- "type"
+  Samples=c_cells@meta.data
+  Controlsample <- row.names(subset(Samples,sample %in% Control))
+  Casesample <- row.names(subset(Samples,sample %in% Case))
+  if(length(Controlsample)>min.cells & length(Casesample)>min.cells){
+    expr <- as.matrix(c_cells@assays$RNA@data)
+    new_expr <- as.matrix(expr[,c(Casesample,Controlsample)])
+    new_sample <- data.frame(Samples=c(Casesample,Controlsample),type=c(rep("Case",length(Casesample)),rep("Control",length(Controlsample))))
+    row.names(new_sample) <- paste(new_sample$Samples,row.names(new_sample),sep="_")
+    expr <- new_expr
+    bad <- which(rowSums(expr>0)<3)
+    expr <- expr[-bad,]
+    group <- new_sample$type
+    dge <- DGEList(counts=expr, group=group)
+    group_edgeR <- factor(group,levels = c("Control","Case"))
+    design <- model.matrix(~ group_edgeR)
+    dge <- estimateDisp(dge, design = design)
+    fit <- glmFit(dge, design)
+    res <- glmLRT(fit)
+    C_data <- res$table
+    C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$logFC,adj.P.Val=p.adjust(C_data$PValue,method = "BH"),P.Value=C_data$PValue)
+    Gene.list[[i]] <- C_data_for_drug
+    C_names <- c(C_names,i)
+  }
+}
+names(Gene.list) <- C_names
 ```
 
 #### Step 4
@@ -306,7 +378,7 @@ library('Seurat')
 GSE92742.gctx.path="GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328.gctx"
 Tissue="breast"
-Drug.score<-DrugScore(SC.integrated=SC.data,
+Drug.score<-DrugScore(SC.integrated=SC.integrated,
                      Gene.data=Gene.list,
                      Cell.type=NULL,
                      Drug.data=Drug.ident.res,
@@ -328,10 +400,10 @@ library('Seurat')
 #select drug using drug socre
 library(Hmisc)
 Final.drugs<-subset(Drug.score,Drug.therapeutic.score>quantile(Drug.score$Drug.therapeutic.score, 0.99,na.rm=T) & FDR <0.05)
-)
+
 
 #select drug for individual clusters
-Final.drugs<-TopDrug(SC.integrated=SC.data,
+Final.drugs<-TopDrug(SC.integrated=SC.integrated,
                    Drug.data=Drug.ident.res,
                    Drug.FDR=0.1,
                    FDA.drug.only=TRUE,
@@ -348,7 +420,7 @@ library('Seurat')
 
 GSE92742.gctx.path="GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
-Drug.combinations<-DrugCombination(SC.integrated=SC.data,
+Drug.combinations<-DrugCombination(SC.integrated=SC.integrated,
                       Gene.data=Gene.list,
                       Drug.data=Drug.ident.res,
                       Drug.FDR=0.1,
