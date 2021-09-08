@@ -10,7 +10,7 @@ The package has been tested on the following systems:
 Windows 10
 CentOS Linux 7
 ```
-#### R package recommended
+#### R packages recommended
 ```
 Seurat
 limma
