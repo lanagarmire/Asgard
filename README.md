@@ -397,12 +397,12 @@ Use '?DrugScore' for more help
 library('Asgard')
 library('Seurat')
 
-#select drug using drug socre
+#Select drug using drug socre
 library(Hmisc)
 Final.drugs<-subset(Drug.score,Drug.therapeutic.score>quantile(Drug.score$Drug.therapeutic.score, 0.99,na.rm=T) & FDR <0.05)
 
 
-#select drug for individual clusters
+#Select drug for individual clusters
 Final.drugs<-TopDrug(SC.integrated=SC.integrated,
                    Drug.data=Drug.ident.res,
                    Drug.FDR=0.1,
