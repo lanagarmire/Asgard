@@ -61,6 +61,10 @@ PrepareReference <- function(cell.info = NULL,
           idx <- which(col_meta$cell_id %in% cell_names & col_meta$pert_type == "trt_cp")
           }
           sig_ids <- col_meta$sig_id[idx]
+		  rm.ids <- grep('REP\\.',sig_ids)
+          if(length(rm.ids)>0){
+             sig_ids <- sig_ids[-rm.ids]
+            }
           length2<-length(sig_ids)
           if(length2 > 0){
           my_ds <- parse_gctx(ds_path, cid=sig_ids)
