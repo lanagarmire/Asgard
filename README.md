@@ -266,7 +266,7 @@ for(i in unique(SC.integrated@meta.data$celltype)){
       tmp <- contrasts.fit(fit, contrasts = contr)
       tmp <- eBayes(tmp)
       C_data <- topTable(tmp, sort.by = "P",n = nrow(tmp))
-      C_data_for_drug <- data.frame(geneSymbol=row.names(C_data),score=C_data$t)
+      C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$t,adj.P.Val=C_data$adj.P.Val,P.Value=C_data$P.Value)
       Gene.list[[i]] <- C_data_for_drug
       C_names <- c(C_names,i)
      }
