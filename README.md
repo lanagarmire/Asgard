@@ -387,7 +387,8 @@ Drug.score<-DrugScore(SC.integrated=SC.integrated,
                      Tissue="breast",
                      GSE92742.gctx=GSE92742.gctx.path,
                      GSE70138.gctx=GSE70138.gctx.path)
-                       
+#Cell.type: cell types/clusters for drug score estimation
+#Case: case samples for drug score estimation
 ```
 Use '?DrugScore' for more help
 
