@@ -380,15 +380,15 @@ GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328.gctx"
 Tissue="breast"
 Drug.score<-DrugScore(SC.integrated=SC.integrated,
                      Gene.data=Gene.list,
-                     Cell.type=NULL, #Select cell types/clusters for drug score estimation
+                     Cell.type=NULL, 
                      Drug.data=Drug.ident.res,
                      FDA.drug.only=TRUE,
-                     Case=Case, #Select samples for drug score estimation
+                     Case=Case, 
                      Tissue="breast",
                      GSE92742.gctx=GSE92742.gctx.path,
                      GSE70138.gctx=GSE70138.gctx.path)
-#Cell.type: cell types/clusters for drug score estimation
-#Case: case samples for drug score estimation
+#Cell.type: select cell types/clusters to be used for drug score estimation
+#Case: select samples to be used for drug score estimation
 ```
 Use '?DrugScore' for more help
 
