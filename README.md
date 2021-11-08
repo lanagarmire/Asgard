@@ -389,6 +389,7 @@ Drug.score<-DrugScore(SC.integrated=SC.integrated,
                      GSE70138.gctx=GSE70138.gctx.path)
 #Cell.type: select cell types/clusters to be used for drug score estimation
 #Case: select samples to be used for drug score estimation
+#Please use " " instead of "-" in tissue name, for example, while haematopoietic-and-lymphoid-tissue is the prefix of the drug reference files, the corresponding tissue name is "haematopoietic and lymphoid tissue". 
 ```
 Use '?DrugScore' for more help
 
