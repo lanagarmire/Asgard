@@ -376,7 +376,7 @@ library('Asgard')
 library('Seurat')
 
 GSE92742.gctx.path="GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
-GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328.gctx"
+GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx
 Tissue="breast"
 Drug.score<-DrugScore(SC.integrated=SC.integrated,
                      Gene.data=Gene.list,
@@ -444,4 +444,4 @@ Final.combinations<-TopCombination(Drug.combination=Drug.combinations,
 ```
 Demo codes using real datasets are available at: https://github.com/lanagarmire/Single-cell-drug-repositioning
 
-If you have further questions or comments, please contact Dr.Bing He: hbing@med.umich.edu
+If you have further questions or comments, please contact Dr.Bing He: hbing@med.umich.edu or hebinghb@gmail.com
