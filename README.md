@@ -445,4 +445,4 @@ Final.combinations<-TopCombination(Drug.combination=Drug.combinations,
 ```
 Demo codes using real datasets are available at: https://github.com/lanagarmire/Single-cell-drug-repositioning
 
-If you have further questions or comments, please contact Dr.Bing He: hbing@med.umich.edu or hebinghb@gmail.com
+If you have further questions or comments, please contact Dr.Bing He: hbing@umich.edu or hebinghb@gmail.com
