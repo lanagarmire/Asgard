@@ -284,7 +284,7 @@ for(i in unique(SC.integrated@meta.data$celltype)){
   c_cells <- subset(SC.integrated, celltype == i)
   Idents(c_cells) <- "type"
   C_data <- FindMarkers(c_cells, ident.1 = "TNBC.PDX", ident.2 = "Normal")
-  C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$avg_logFC,adj.P.Val=C_data$p_val_adj,P.Value=C_data$p_val)
+  C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$avg_logFC,adj.P.Val=C_data$p_val_adj,P.Value=C_data$p_val) ##for Seurat version > 4.0, please use avg_log2FC instead of avg_logFC
   Gene.list[[i]] <- C_data_for_drug
   C_names <- c(C_names,i)
 }
@@ -301,7 +301,7 @@ for(i in unique(SC.integrated@meta.data$celltype)){
   c_cells <- subset(SC.integrated, celltype == i)
   Idents(c_cells) <- "type"
   C_data <- FindMarkers(c_cells, ident.1 = "TNBC.PDX", ident.2 = "Normal", test.use = "DESeq2")
-  C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$avg_logFC,adj.P.Val=C_data$p_val_adj,P.Value=C_data$p_val)
+  C_data_for_drug <- data.frame(row.names=row.names(C_data),score=C_data$avg_logFC,adj.P.Val=C_data$p_val_adj,P.Value=C_data$p_val) ##for Seurat version > 4.0, please use avg_log2FC instead of avg_logFC
   Gene.list[[i]] <- C_data_for_drug
   C_names <- c(C_names,i)
 }
