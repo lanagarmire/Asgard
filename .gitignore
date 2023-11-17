@@ -1,3 +1,6 @@
+# Docker related
+/build/
+
 # History files
 .Rhistory
 .Rapp.history

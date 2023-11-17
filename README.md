@@ -72,8 +72,24 @@ devtools::install_github("lanagarmire/Asgard")
 ```
 library('Asgard')
 ```
+#### Docker
 
-## Prepare Drug Reference Library
+You can run Asgard via Docker. First, install Docker for your platform.
+
+```
+docker run --rm -v `pwd`:/home/rstudio/Asgard -p 8787:8787 -it lanagarmire/asgard:1.0.0
+```
+
+This will mount the directory that you are currently working in so it is accessible by the Docker container.
+
+You can then open a browser and navigate to 127.0.0.1:8787, put in "rstudio" as the username and 
+copy the password from the terminal. You will want to change the working directory to "/home/rstudio/Asgard".
+
+To build the DrugReference, you will need a large amount of RAM (64GB).
+
+Upon completion, you can press ^C in the terminal to quit the rstudio server.
+
+## Prepare Drug Referecne Library
 #### Step 1
 #### Download L1000 Connectivity Map perturbational profiles GSE70138 and GSE92742 from GEO
 <p>Method 1: click file names below </p>
