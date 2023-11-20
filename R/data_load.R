@@ -108,8 +108,6 @@ load_luekemia <- function(cache_dir=NULL) {
     gse132509_temp <- tempfile()
     untar(gse132509_path, exdir=gse132509_temp)
 
-    print(list.files(gse132509_temp))
-
     # Load control samples
     sample_files <- list(
         PBMMC_1 = "GSM3872442_PBMMC_1", 
