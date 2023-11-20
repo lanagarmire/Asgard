@@ -2,10 +2,28 @@
 #'
 #' @format 
 #' @source 
-"FDA_drug"
+"FDA.drug"
 
 #' #TODO
 #'
 #' @format 
 #' @source 
-"L1000_meta"
+"cell_data"
+
+#' #TODO
+#'
+#' @format 
+#' @source 
+"col_meta_GSE70138"
+
+#' #TODO
+#'
+#' @format 
+#' @source 
+"col_meta_GSE92742"
+
+#' #TODO
+#'
+#' @format 
+#' @source 
+"gene_meta"
