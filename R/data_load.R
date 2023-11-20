@@ -163,4 +163,5 @@ load_luekemia <- function(cache_dir=NULL) {
     }
 
     unlink(gse132509_temp, recursive=TRUE)
+    return(sobjects)
 }
