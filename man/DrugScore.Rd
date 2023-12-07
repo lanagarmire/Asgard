@@ -2,45 +2,59 @@
 % Please edit documentation in R/DrugScore.R
 \name{DrugScore}
 \alias{DrugScore}
-\title{Drug Score}
+\title{Calculate drug score}
 \usage{
 DrugScore(
-  SC.integrated = SC.data,
-  Gene.data = Gene.list,
-  Cell.type = NULL,
-  Drug.data = Drug.ident.res,
-  FDA.drug.only = TRUE,
-  GSE92742.gctx = NULL,
-  GSE70138.gctx = NULL,
-  Case = NULL,
-  Tissue = "breast"
+  cell_metadata,
+  cluster_degs,
+  cluster_drugs,
+  tissue,
+  gse70138_gctx_path,
+  gse92742_gctx_path,
+  clusters = NULL,
+  case = NULL,
+  fda_drugs_only = TRUE
 )
 }
 \arguments{
-\item{SC.integrated}{A Seurat object of aligned single cells.}
+\item{cell_metadata}{A data.frame of cell metadata. It must have a column 
+named 'cluster' indicating which cluster cells belong, and a column named 
+'sample' indicating which sample cells belong.}
 
-\item{Gene.data}{A list of differnential gene expression profiles for every cell type. It's from GetGene function.}
+\item{cluster_degs}{A list of differential gene expression profiles for 
+each cluster.}
 
-\item{Cell.type}{Select which clusters (cell types) to be used for drug score estimation. By default, it uses all clusters.}
+\item{cluster_drugs}{Drug repurposing result from GetDrug function.}
 
-\item{Drug.data}{Drug repurosing result from GetDrug function.}
+\item{tissue}{Reference tissue. If one used 'lung_rankMatrix.txt' in 
+GetDrugRef function, then the Reference tissue is lung. Please use " " 
+instead of "-" in tissue name. For example, while 
+'haematopoietic-and-lymphoid-tissue' is the prefix of the drug reference 
+files, the corresponding tissue name is "haematopoietic and lymphoid tissue".}
 
-\item{FDA.drug.only}{logical; if TRUE, will only return FDA-approved drugs, else, will return all inputted drugs/compounds}
+\item{gse70138_gctx_path}{The gctx file contains drug responses from GSE70138 
+dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).}
 
-\item{GSE92742.gctx}{The gctx file contains drug responses from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).}
+\item{gse92742_gctx_path}{The gctx file contains drug responses from GSE92742 
+dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742)..}
 
-\item{GSE70138.gctx}{The gctx file contains drug responses from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).}
+\item{clusters}{Select which clusters (cell types) to be used for drug score 
+estimation. By default, it uses all clusters.}
 
-\item{Case}{A vector contains case sample names.}
+\item{case}{A vector containing case sample names.}
 
-\item{Tissue}{Reference tissue. If one used lung_rankMatrix.txt in GetDrugRef function, then the Reference tissue is lung.}
+\item{fda_drugs_only}{logical; if TRUE, will only return FDA-approved drugs, 
+else, will return all drugs/compounds.}
 }
 \value{
 A data frame of drug score, P-value and FDR.
 }
 \description{
-The drug score is a comprehensive estimation of drug therapeutic effects acrossing all or selected single cell clusters.
+The drug score is a comprehensive estimation of drug therapeutic 
+effects using all or a selected set of clusters.
 }
 \details{
-This function estimates drug treatment efficacy using therapeutics score, fisher's combined P-value and FDR.
+This function calculates drug score using cellular proportion of 
+clusters, the significance of reversal in DEGs' expressions, and the ratio of 
+the reversed genes.
 }
