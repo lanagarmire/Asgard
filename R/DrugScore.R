@@ -25,6 +25,7 @@
 #' @param fda_drugs_only logical; if TRUE, will only return FDA-approved drugs, 
 #' else, will return all drugs/compounds.
 #' @return A data frame of drug score, P-value and FDR.
+#' @export
 #' @import cmapR
 DrugScore <- function(cell_metadata, cluster_degs, cluster_drugs, tissue,
 					  gse70138_gctx_path, gse92742_gctx_path, 
