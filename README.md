@@ -449,9 +449,9 @@ cell_metadata <- SC.integrated@meta.data
 cell_metadata$cluster <- SC.integrated@meta.data$celltype
 
 Drug.score <- DrugScore(cell_metadata, cluster_degs = Gene.list, 
-						cluster_drugs = Drug.ident.res, tissue = "breast", 
-						case = Case, gse92742_gctx_path = gse92742_gctx_path, 
-						gse70138_gctx_path = gse70138_gctx_path)
+                        cluster_drugs = Drug.ident.res, tissue = "breast", 
+                        case = Case, gse92742_gctx_path = gse92742_gctx_path, 
+                        gse70138_gctx_path = gse70138_gctx_path)
 ```
 
 #### Step 6: Select mono-drug therapies
