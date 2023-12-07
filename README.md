@@ -434,11 +434,14 @@ Use '?GetDrug' for more help
 
 #### Step 5: Estimation of drug score
 
+Calculate drug score using information from all or a subset of clusters. Use 
+`?DrugScore` for more help.
+
 ```R
 library('Asgard')
 library('Seurat')
 
-# Change the following two with the paths on your computer
+# Change the following two lines with the paths on your computer
 gse92742_gctx_path <- "GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
 gse70138_gctx_path <- "GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
 
@@ -447,14 +450,11 @@ cell_metadata$cluster <- SC.integrated@meta.data$celltype
 
 Drug.score <- DrugScore(cell_metadata, cluster_degs = Gene.list, 
 						cluster_drugs = Drug.ident.res, tissue = "breast", 
-						case = Case, gse92742_gctx_path = gse92742_gctx_path,
-                     	gse70138_gctx_path = gse70138_gctx_path)
+						case = Case, gse92742_gctx_path = gse92742_gctx_path, 
+						gse70138_gctx_path = gse70138_gctx_path)
 ```
 
-Use `?DrugScore` for more help.
-
-#### Step 6
-#### Select mono-drug therapies
+#### Step 6: Select mono-drug therapies
 ```
 library('Asgard')
 library('Seurat')
