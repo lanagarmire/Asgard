@@ -1,165 +1,210 @@
-#' @title Drug Score
-#' @description  The drug score is a comprehensive estimation of drug therapeutic effects acrossing all or selected single cell clusters. 
-#' @details This function estimates drug treatment efficacy using therapeutics score, fisher's combined P-value and FDR.
-#' @param SC.integrated A Seurat object of aligned single cells.
-#' @param Gene.data A list of differnential gene expression profiles for every cell type. It's from GetGene function.
-#' @param Cell.type Select which clusters (cell types) to be used for drug score estimation. By default, it uses all clusters.
-#' @param Drug.data Drug repurosing result from GetDrug function.
-#' @param FDA.drug.only logical; if TRUE, will only return FDA-approved drugs, else, will return all inputted drugs/compounds
-#' @param GSE92742.gctx The gctx file contains drug responses from GSE92742 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742).
-#' @param GSE70138.gctx The gctx file contains drug responses from GSE70138 dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).
-#' @param Case A vector contains case sample names.
-#' @param Tissue Reference tissue. If one used lung_rankMatrix.txt in GetDrugRef function, then the Reference tissue is lung.
+#' @title Calculate drug score
+#' @description The drug score is a comprehensive estimation of drug therapeutic 
+#' effects using all or a selected set of clusters. 
+#' @details This function calculates drug score using cellular proportion of 
+#' clusters, the significance of reversal in DEGs' expressions, and the ratio of 
+#' the reversed genes. 
+#' @param cell_metadata A data.frame of cell metadata. It must have a column 
+#' named 'cluster' indicating which cluster cells belong, and a column named 
+#' 'sample' indicating which sample cells belong. 
+#' @param cluster_degs A list of differential gene expression profiles for 
+#' each cluster.
+#' @param cluster_drugs Drug repurposing result from GetDrug function.
+#' @param tissue Reference tissue. If one used 'lung_rankMatrix.txt' in 
+#' GetDrugRef function, then the Reference tissue is lung. Please use " " 
+#' instead of "-" in tissue name. For example, while 
+#' 'haematopoietic-and-lymphoid-tissue' is the prefix of the drug reference 
+#' files, the corresponding tissue name is "haematopoietic and lymphoid tissue".
+#' @param gse70138_gctx_path The gctx file contains drug responses from GSE70138 
+#' dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE70138).
+#' @param gse92742_gctx_path The gctx file contains drug responses from GSE92742 
+#' dataset (https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE92742)..
+#' @param clusters Select which clusters (cell types) to be used for drug score 
+#' estimation. By default, it uses all clusters.
+#' @param case A vector containing case sample names.
+#' @param fda_drugs_only logical; if TRUE, will only return FDA-approved drugs, 
+#' else, will return all drugs/compounds.
 #' @return A data frame of drug score, P-value and FDR.
 #' @export
 #' @import cmapR
+DrugScore <- function(cell_metadata, cluster_degs, cluster_drugs, tissue,
+					  gse70138_gctx_path, gse92742_gctx_path, 
+					  clusters = NULL, case = NULL, fda_drugs_only = TRUE) {
 
+	# Subset input data to the set of clusters we are interested in 
+    if (length(clusters) > 0) {
+    	clusters = intersect(clusters, unique(cell_metada$cluster))
+      	cell_metadata = subset(cell_metadata, cluster %in% clusters)
+      	cluster_drugs = cluster_drugs[clusters]
+      	cluster_degs = cluster_degs[clusters]
+    }
 
-DrugScore <- function(SC.integrated=SC.data,
-                            Gene.data=Gene.list,
-                            Cell.type=NULL,
-                            Drug.data=Drug.ident.res,
-                            FDA.drug.only=TRUE,
-                            GSE92742.gctx=NULL,
-                            GSE70138.gctx=NULL,
-                            Case=NULL,
-                            Tissue="breast"
-){
-    if(length(Cell.type)>0){
-      Cell.type=intersect(Cell.type, unique(SC.integrated@meta.data$celltype))
-      SC.integrated=subset(SC.integrated, celltype %in% Cell.type)
-      Drug.data=Drug.data[Cell.type]
-      Gene.data=Gene.data[Cell.type]
+    # Calculate cluster proportions in diseased tissue
+    if (length(case) > 0) {
+      	cell_metadata <- subset(cell_metadata, sample %in% case)
     }
-    ##Cell proportion
-    cells <- SC.integrated@meta.data
-    if(length(Case)>0){
-      cells <- subset(cells,sample %in% Case)
-      SC.integrated=subset(SC.integrated, sample %in% Case)
-    }
-    cells <- cells$celltype
-    cell.count <- table(cells)
-    cell.count <- cell.count[which(cell.count>3)]
-    cells.freq <- round(100*cell.count/length(cells),2)
-    cells.freq.rank <- rank(as.vector(cells.freq))
+    clustering <- cell_metadata$cluster
+    cluster_sizes <- table(clustering)
+    cluster_sizes <- cluster_sizes[which(cluster_sizes > 3)]
+    cluster_prop <- round(100*cluster_sizes/nrow(cell_metadata), 2) 
 
-    ##Load drug data
-    Drug.list <- data.frame()
-    for(i in names(Drug.data)){
-      Cd <- Drug.data[[i]]
-      Cd <- Cd[!duplicated(Cd$Drug.name),]
-      Drugs <- Cd$Drug.name
-      if(FDA.drug.only==TRUE){
-      Drugs <- intersect(Drugs,FDA.drug)
-      }
-      if(length(Drugs)>0){
-      Cd <- subset(Cd, Drug.name %in% Drugs)
-      FDRs <- Cd$FDR
-      Pvalue <- Cd$P.value
-      temp <- data.frame(Drug=Drugs,Cluster=i,Size=cells.freq[i],P.value=Pvalue,FDR=FDRs,row.names = NULL)
-      Drug.list <- rbind(Drug.list,temp)
-      }
+    # Combine cluster drugs into a single data frame
+    drug_list <- data.frame()
+    for (i in names(cluster_drugs)) {
+    	ith_cluster_drugs <- cluster_drugs[[i]]
+		drug_names <- ith_cluster_drugs$Drug.name
+      	ith_cluster_drugs <- ith_cluster_drugs[!duplicated(drug_names), ]
+
+		# Subset to FDA drugs
+      	if (fda_drugs_only) {
+      		drug_names <- intersect(drug_names, FDA.drug)
+      	}
+
+      	if (length(drug_names)>0) {
+      		ith_cluster_drugs <- subset(ith_cluster_drugs, Drug.name %in% drug_names)
+      		fdrs <- ith_cluster_drugs$FDR
+      		p_values <- ith_cluster_drugs$P.value
+      		
+			temp <- data.frame(
+				drug = drug_names, 
+				cluster = i,
+				cluster_prop = cluster_prop[i],
+				p_value = p_values,
+				fdr = fdrs,
+				row.names = NULL
+			)
+      		drug_list <- rbind(drug_list, temp)
+      	}
     }
-    Drug.list <- unique(Drug.list)
-    Drug.list$P.value <- Drug.list$P.value
-    Drug.list$w.size <- Drug.list$Size*(-log10(Drug.list$FDR))
-    Drug.list[is.na(Drug.list)] <- 0
-    Drug.coverage <- tapply(Drug.list$w.size, Drug.list$Drug,sum)
-    C.Drugs <- rownames(Drug.coverage)
-    
-    ##Combine P value
-    if(length(unique(names(Drug.data)))>1){
-       Combined.Pvalue <- tapply(Drug.list$P.value, Drug.list$Drug, CombineP)
+    drug_list <- unique(drug_list)
+    drug_list$weighted_prop <- drug_list$cluster_prop*(-log10(drug_list$fdr))
+    drug_list[is.na(drug_list)] <- 0
+
+    drug_coverage <- tapply(drug_list$weighted_prop, drug_list$drug, sum)
+    drugs <- rownames(drug_coverage)
+
+    # Combine cluster spesific p-values of drugs
+    if(length(unique(names(cluster_drugs)))>1){
+       	combined_p_values <- tapply(drug_list$p_value, drug_list$drug, CombineP)
     }else{
-      Combined.Pvalue <- Drug.list$P.value
-      names(Combined.Pvalue) <- Drug.list$Drug
+      	combined_p_values <- drug_list$p_value
+      	names(combined_p_values) <- drug_list$drug
     }
   
-    ##Cell line information
-    cells <- subset(cell_data,primary_site == Tissue)$cell_id
+	# Cell line information
+    cell_lines <- subset(cell_data, primary_site == tissue)$cell_id
 
-    ##Load experiment information
-    data_infor1 <- col_meta_GSE92742[,c("sig_id","pert_iname")]
-    row.names(data_infor1) <- data_infor1$sig_id
-    idx <- which(col_meta_GSE92742$cell_id %in% cells & col_meta_GSE92742$pert_iname %in% C.Drugs)
+    # Load drugs metadata for GSE92742 and subset it to tissue of interest and 
+	# drugs of interest
+    drug_metadata_92742 <- col_meta_GSE92742[, c("sig_id", "pert_iname")]
+    row.names(drug_metadata_92742) <- drug_metadata_92742$sig_id
+    idx <- which(col_meta_GSE92742$cell_id %in% cell_lines & 
+				 col_meta_GSE92742$pert_iname %in% drugs)
     sig_ids <- col_meta_GSE92742$sig_id[idx]
-    data_infor1 <- data_infor1[sig_ids,]
+    drug_metadata_92742 <- drug_metadata_92742[sig_ids, ]
 
-    ##Load drug response
-    my_ds <- parse_gctx(GSE92742.gctx, cid=sig_ids)
-    gene.data <- as.data.frame(my_ds@mat)
-    gene.data$geneid <- row.names(gene.data)
-    treatments <- colnames(gene.data)
-    treatments <- setdiff(treatments,"geneid")
-    data <- merge(gene.data,gene_meta,by.x="geneid",by.y="pr_gene_id")
-    data1 <- data[,c("pr_gene_symbol",treatments)]
+    # Load drug response for GSE92742
+    exprs <- as.data.frame(parse_gctx(gse92742_gctx_path, cid=sig_ids)@mat)
+    treatments <- colnames(exprs)
+	exprs$gene_id <- row.names(exprs)
+    tmp <- merge(exprs, gene_meta, by.x="gene_id", by.y="pr_gene_id")
+    drug_responses_92742 <- tmp[, c("pr_gene_symbol", treatments)]
 
-    ##Load experiment information
-    data_infor2 <- col_meta_GSE70138[,c("sig_id","pert_iname")]
-    row.names(data_infor2) <- data_infor2$sig_id
-    idx <- which(col_meta_GSE70138$cell_id %in% cells & col_meta_GSE70138$pert_iname %in% C.Drugs)
+    # Load drugs metadata for GSE70138 and subset it to tissue of interest and 
+	# drugs of interest
+    drug_metadata_70138 <- col_meta_GSE70138[, c("sig_id", "pert_iname")]
+    row.names(drug_metadata_70138) <- drug_metadata_70138$sig_id
+    idx <- which(col_meta_GSE70138$cell_id %in% cell_lines & 
+				 col_meta_GSE70138$pert_iname %in% drugs)
     sig_ids <- col_meta_GSE70138$sig_id[idx]
-    data_infor2 <- data_infor2[sig_ids,]
+    drug_metadata_70138 <- drug_metadata_70138[sig_ids, ]
 
-    ##Load drug response
-    sig_ids <- col_meta_GSE70138$sig_id[idx]
-    my_ds <- parse_gctx(GSE70138.gctx, cid=sig_ids)
-    gene.data <- as.data.frame(my_ds@mat)
-    gene.data$geneid <- row.names(gene.data)
-    treatments <- colnames(gene.data)
-    treatments <- setdiff(treatments,"geneid")
-    data <- merge(gene.data,gene_meta,by.x="geneid",by.y="pr_gene_id")
-    data2 <- data[,c("pr_gene_symbol",treatments)]
-    data <- merge(data1,data2,by="pr_gene_symbol")
-    row.names(data) <- data[,1]
-    data <- data[,-1]
-    data_infor <- rbind(data_infor1,data_infor2)
+    # Load drug response for GSE70138
+    exprs <- as.data.frame(parse_gctx(gse70138_gctx_path, cid=sig_ids)@mat)
+    treatments <- colnames(exprs)
+    exprs$gene_id <- row.names(exprs)
+	tmp <- merge(exprs, gene_meta, by.x="gene_id", by.y="pr_gene_id")
+    drug_responses_70138 <- tmp[, c("pr_gene_symbol", treatments)]
 
-    ##Drug score
-    D.genes <- list()
-    for(i in names(Gene.data)){
-      Cd <- Gene.data[[i]]
-      Cd <- subset(Cd, adj.P.Val<0.05)
-      D.genes.temp <- list(temp=rownames(Cd))
-      D.genes <- cbind(D.genes,D.genes.temp)
+    drug_responses <- merge(drug_responses_92742, drug_responses_70138, 
+							by="pr_gene_symbol")
+    row.names(drug_responses) <- drug_responses[, 1]
+    drug_responses <- drug_responses[, -1]
+    drug_metadata <- rbind(drug_metadata_92742, drug_metadata_70138)
+
+	# Find DEGs that are common to all clusters
+    common_degs <- list()
+    for (i in names(cluster_degs)) {
+    	ith_cluster_degs <- cluster_degs[[i]]
+      	ith_cluster_degs <- subset(ith_cluster_degs, adj.P.Val < 0.05)
+		if (length(ith_cluster_degs) > 0) {
+	    	common_degs[[i]] <- rownames(ith_cluster_degs)
+		}
     }
-    D.genes <- Reduce(intersect,D.genes)
-    Gene.expression <- data.frame()
-    for(i in names(Gene.data)){
-      Cd <- Gene.data[[i]]
-      if(nrow(Gene.expression)==0){
-        Gene.expression <- data.frame(Score=Cd[D.genes,"score"])
-      }else{
-      Gene.expression.temp <- data.frame(Score=Cd[D.genes,"score"])
-      Gene.expression <- cbind(Gene.expression,Gene.expression.temp)
-      }
+	common_degs <- Reduce(intersect, common_degs)
+
+	# Combine cluster specific DEG scores into a matrix
+	deg_scores <- data.frame()
+    for (i in names(cluster_degs)) {
+    	ith_cluster_degs <- cluster_degs[[i]]
+    	if (nrow(deg_scores) == 0) {
+    		deg_scores <- data.frame(score = ith_cluster_degs[common_degs, "score"])
+    	} else {
+    	    tmp <- data.frame(score = ith_cluster_degs[common_degs,"score"])
+        	deg_scores <- cbind(deg_scores, tmp)
+       }
     }
-    Gene.expression <- as.data.frame(Gene.expression)
-    Gene.expression <- as.matrix(Gene.expression)
-    row.names(Gene.expression) <- D.genes
-    D.gene.expression <- apply(Gene.expression,1,mean)
-    names(D.gene.expression) <- D.genes
-    Single.treated.score.list <- NULL
-    for(Drug in C.Drugs){
-      D.genes.treated <- NULL
-      drug.treatments <- subset(data_infor,pert_iname == Drug)$sig_id
-      if(length(drug.treatments)>1){
-        drug.responses <- data[,drug.treatments]
-        drug.responses.mean <- apply(drug.responses,1,mean)
-      }else{
-        drug.responses <- data[,drug.treatments]
-        drug.responses.mean <- drug.responses
-      }
-      D.D.genes <- intersect(names(D.gene.expression),names(drug.responses.mean))
-      D.genes.treated <- -D.gene.expression[D.D.genes]*drug.responses.mean[D.D.genes]
-      D.genes.treated <- D.genes.treated[which(D.genes.treated>0)]
-      Mean.treated <- mean(D.genes.treated)
-      Ratio.treated <- length(D.genes.treated)/length(D.D.genes)
-      Coverage.treated <- Drug.coverage[Drug]/100
-      Treated.score <- (Ratio.treated*Coverage.treated)
-      Single.treated.score.list <- c(Single.treated.score.list,Treated.score)
+    deg_scores <- as.matrix(deg_scores)
+    row.names(deg_scores) <- common_degs
+
+    deg_scores_mean <- apply(deg_scores, 1, mean)
+    names(deg_scores_mean) <- common_degs
+
+	# Calculate drug score
+    drug_scores <- list()
+    for (drug in drugs) {
+		# Get response from CMap
+		treatments <- subset(drug_metadata, pert_iname == drug)$sig_id
+		if (length(treatments) > 1) {
+			curr_drug_response <- drug_responses[, treatments]
+			mean_response <- apply(curr_drug_response, 1, mean)
+		} else {
+			curr_drug_response <- drug_responses[, treatments]
+			mean_response <- curr_drug_response
+		}
+
+		drug_stats <- drug_list[drug_list$drug == drug, ]
+		drug_score <- 0
+		for (i in names(cluster_degs)) {
+			cluster_prop <- drug_stats[drug_stats$cluster == i, "cluster_prop"]
+			fdr <- drug_stats[drug_stats$cluster == i, "fdr"]
+			p_value <- drug_stats[drug_stats$cluster == i, "p_value"]
+
+			ith_cluster_degs <- cluster_degs[[i]]
+      		ith_cluster_degs <- subset(ith_cluster_degs, adj.P.Val < 0.05)
+
+			treatable_degs <- intersect(row.names(ith_cluster_degs), names(mean_response))
+			if (length(treatable_degs > 0)) {
+				deg_scores <- ith_cluster_degs[treatable_degs, "score"]
+
+				treated_degs <- -deg_scores*mean_response[treatable_degs]
+				treated_degs <- treated_degs[which(treated_degs > 0)]
+
+				treated_degs_ratio <- length(treated_degs)/length(treatable_degs)
+				drug_score <- drug_score +
+					(cluster_prop/100)*(-log10(fdr))*treated_degs_ratio
+			}
+	    }
+		
+		drug_scores[[drug]] <- drug_score
     }
-    Res.table <- data.frame(Drug.therapeutic.score=Single.treated.score.list[C.Drugs],P.value=Combined.Pvalue[C.Drugs],FDR=p.adjust(Combined.Pvalue[C.Drugs],method = "BH"))
-    return(Res.table)
+	drug_scores <- t(as.data.frame(drug_scores))
+
+    out <- data.frame(
+		Drug.therapeutic.score = drug_scores,
+		P.value = combined_p_values[drugs],
+		FDR = p.adjust(combined_p_values[drugs], method = "BH")
+	)
+    return(out)
 
 }

@@ -1,21 +1,32 @@
-## Asgard: A Single-cell Guided pipeline to Aid Repurposing of Drugs 
-Using scRNA-seq data, Asgard repurposes drugs and predicts personalized drug combinations to address the cellular heterogeneity of patients. 
+# **Asgard: A Single-cell Guided pipeline to Aid Repurposing of Drugs**
 
-![image](https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-023-36637-3/MediaObjects/41467_2023_36637_Fig1_HTML.png?as=webp)
+Using scRNA-seq data, Asgard repurposes drugs and predicts personalized drug
+combinations to address the cellular heterogeneity of patients. 
 
-### Citation 
-He, B., Xiao, Y., Liang, H. et al. ASGARD is A Single-cell Guided Pipeline to Aid Repurposing of Drugs. *Nat Commun* 14, 993 (2023). https://doi.org/10.1038/s41467-023-36637-3
-## System Requirements
-### Hardware requirements
-Asgard package requires only a standard computer with enough RAM (>64GB) to support the in-memory operations.
-### Software requirements
-#### OS requirements
+![image](asgard_pipeline.png)
+
+### **Citation**
+
+> He, B., Xiao, Y., Liang, H. et al. ASGARD is A Single-cell Guided Pipeline to
+Aid Repurposing of Drugs. *Nat Commun* 14, 993 (2023).
+https://doi.org/10.1038/s41467-023-36637-3
+
+## **System Requirements**
+
+### **Hardware requirements**
+
+Asgard package requires only a standard computer with enough RAM (>64GB) to
+support the in-memory operations.
+
+### **Software requirements**
+
 The package has been tested on the following systems:
 ```
 Windows 10
 CentOS Linux 7
 ```
-#### R packages recommended
+
+Required R packages:
 ```
 Seurat
 limma
@@ -129,33 +140,56 @@ PrepareReference(cell.info="GSE70138_Broad_LINCS_cell_info_2017-04-28.txt",
 ```
 Please use '?PrepareReference' for more help.
 
-## Drug Repurposing
-#### Step 1
-#### Load single-cell RNA-seq data
-<p>Download datasets GSE113197 and GSE123926 from GEO before running this script.</p>
+## **Drug Repurposing**
+### **Step 1: Load single-cell RNA-seq data**
 
-Human Breast Cancer Epithelial Cells (GSE123926): [GSE123926_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE123926&format=file) 
+Download datasets GSE113197 and GSE123926 from GEO before running this script.
 
-Normal Human Breast Epithelial Cells (GSE113197): [GSE113197_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE113197&format=file) 
+Human Breast Cancer Epithelial Cells (GSE123926):
+[GSE123926_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE123926&format=file) 
 
-```
+Normal Human Breast Epithelial Cells (GSE113197):
+[GSE113197_RAW.tar](https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE113197&format=file) 
+
+```R
 library('Seurat')
 
-#Load normal sample Ind5 from GSE113197 dataset
-celltype<-read.table(file="https://raw.githubusercontent.com/lanagarmire/Single-cell-drug-repositioning/master/Normal_celltype.txt",header = T,check.names=FALSE)
-data<-read.table(file="GSM3099847_Ind5_Expression_Matrix.txt",header = T,check.names=FALSE)
-row.names(data)<-data[,1]
-data<-data[,-1]
-celltype2<-subset(celltype,sample=="Ind5" & celltype %in% c("Luminal_L2_epithelial_cells","Luminal_L1.1_epithelial_cells", "Luminal_L1.2_epithelial_cells", "Basal_epithelial_cells"))
-common <- intersect(colnames(data), rownames(celltype2))
-data<-data[,common]
-Epithelial2 <- CreateSeuratObject(counts = data, project = "Epithelial", min.cells = 3, min.features = 200,meta.data=data.frame(celltype2,cell=colnames(data),type="Normal"))
+# Load cells' cell type annotations for GSE113197
+cell_types_file <- paste0(
+	"https://raw.githubusercontent.com/lanagarmire/"
+	"Single-cell-drug-repositioning/master/Drug/Normal_celltype.txt"
+)
+cell_types <- read.table(file=celltypes, header=TRUE, check.names=FALSE)
+
+# Cell type of interest
+cell_types_names <- c(
+  	"Luminal_L2_epithelial_cells", "Luminal_L1.1_epithelial_cells", 
+    "Luminal_L1.2_epithelial_cells", "Basal_epithelial_cells"
+)
+
+# Load normal sample Ind5 from GSE113197 dataset 
+data <- read.table(file="GSM3099847_Ind5_Expression_Matrix.txt", 
+                   header=TRUE, check.names=FALSE)
+row.names(data) <- data[, 1]
+data <- data[, -1]
+ind5_cells <- subset(cell_type, sample=="Ind5" & celltype %in% celltypes_names)
+common <- intersect(colnames(data), rownames(ind5_cells))
+data <- data[, common]
+
+metadata = data.frame(
+	ind5_celltypes,
+	cell = colnames(data),
+	type = "normal"
+)
+epithelial2 <- CreateSeuratObject(counts=data, project="Epithelial", min.cells=3, 
+								  min.features=200, meta.data=metada)
 
 #Load normal sample Ind6 from GSE113197 dataset
-data<-read.table(file="GSM3099848_Ind6_Expression_Matrix.txt",header = T,check.names=FALSE)
-row.names(data)<-data[,1]
-data<-data[,-1]
-celltype3<-subset(celltype,sample=="Ind6" & celltype %in% c("Luminal_L2_epithelial_cells","Luminal_L1.1_epithelial_cells", "Luminal_L1.2_epithelial_cells", "Basal_epithelial_cells"))
+data <- read.table(file="GSM3099848_Ind6_Expression_Matrix.txt", header=TRUE,
+				   check.names=FALSE)
+row.names(data) <- data[, 1]
+data <- data[, -1]
+ind6_cells <- subset(celltype,sample=="Ind6" & celltype %in% c("Luminal_L2_epithelial_cells","Luminal_L1.1_epithelial_cells", "Luminal_L1.2_epithelial_cells", "Basal_epithelial_cells"))
 common <- intersect(colnames(data), rownames(celltype3))
 data<-data[,common]
 Epithelial3 <- CreateSeuratObject(counts = data, project = "Epithelial", min.cells = 3, min.features = 200,meta.data=data.frame(celltype3,cell=colnames(data),type="Normal"))
@@ -182,30 +216,37 @@ TNBC.PDX3 <- CreateSeuratObject(counts = TNBC_PDX.data, project = "TNBC", min.ce
 
 #### Step 2
 #### Single-cell alignment
-```
-SC.list<-list(TNBC.PDX2=TNBC.PDX2,TNBC.PDX3=TNBC.PDX3,Epithelial2=Epithelial2,Epithelial3=Epithelial3,Epithelial4=Epithelial4)
-CellCycle=TRUE #Set it TRUE if you want to do Cell Cycle Regression
+```R 
+SC.list <- list(
+	TNBC.PDX2 = TNBC.PDX2,
+	TNBC.PDX3 = TNBC.PDX3,
+	Epithelial2 = Epithelial2,
+	Epithelial3 = Epithelial3,
+	Epithelial4 = Epithelial4
+)
+CellCycle = TRUE #Set it TRUE if you want to do Cell Cycle Regression
 anchor.features=2000
 
 for (i in 1:length(SC.list)) {
-     SC.list[[i]] <- NormalizeData(SC.list[[i]], verbose = FALSE)
-     SC.list[[i]] <- FindVariableFeatures(SC.list[[i]], selection.method = "vst",
+    SC.list[[i]] <- NormalizeData(SC.list[[i]], verbose = FALSE)
+    SC.list[[i]] <- FindVariableFeatures(SC.list[[i]], selection.method = "vst",
                            nfeatures = anchor.features, verbose = FALSE)
-    }
+}
     SC.anchors <- FindIntegrationAnchors(object.list = SC.list,anchor.features = anchor.features, dims = 1:15)
     SC.integrated <- IntegrateData(anchorset = SC.anchors, dims = 1:15)
     DefaultAssay(SC.integrated) <- "integrated"
-    if(CellCycle){
-    ##Cell Cycle Regression
-    s.genes <- cc.genes$s.genes
-    g2m.genes <- cc.genes$g2m.genes
-    SC.integrated <- CellCycleScoring(SC.integrated, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
-    SC.integrated <- ScaleData(SC.integrated, vars.to.regress = c("S.Score", "G2M.Score"), features = rownames(SC.integrated))
-    SC.integrated <- RunPCA(SC.integrated, npcs = 15, verbose = FALSE)
-    }else{
-     ##Run the standard workflow for visualization and clustering
-     SC.integrated <- ScaleData(SC.integrated, verbose = FALSE)
-     SC.integrated <- RunPCA(SC.integrated, npcs = 15, verbose = FALSE)
+    if (CellCycle) {
+		##Cell Cycle Regression
+		s.genes <- cc.genes$s.genes
+		g2m.genes <- cc.genes$g2m.genes
+		SC.integrated <- CellCycleScoring(SC.integrated, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
+		SC.integrated <- ScaleData(SC.integrated, vars.to.regress = c("S.Score", "G2M.Score"), features = rownames(SC.integrated))
+		SC.integrated <- RunPCA(SC.integrated, npcs = 15, verbose = FALSE)
+    }
+	else {
+		##Run the standard workflow for visualization and clustering
+		SC.integrated <- ScaleData(SC.integrated, verbose = FALSE)
+		SC.integrated <- RunPCA(SC.integrated, npcs = 15, verbose = FALSE)
     }
     ##t-SNE and Clustering
     SC.integrated <- RunUMAP(SC.integrated, reduction = "pca", dims = 1:15)
@@ -371,7 +412,7 @@ names(Gene.list) <- C_names
 
 #### Step 4
 #### Mono-drug repurposing for every cell type
-```
+```R
 library('Asgard')
 
 #Load tissue specific drug reference produced by PrepareReference function as mentioned above. Please select proper tissue accroding to the disease.
@@ -391,32 +432,29 @@ Drug.ident.res = GetDrug(gene.data = Gene.list,
 ```
 Use '?GetDrug' for more help
 
-#### Step 5
-#### Estimation of drug score
-```
+#### Step 5: Estimation of drug score
+
+Calculate drug score using information from all or a subset of clusters. Use 
+`?DrugScore` for more help.
+
+```R
 library('Asgard')
 library('Seurat')
 
-GSE92742.gctx.path="GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
-GSE70138.gctx.path="GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx
-Tissue="breast"
-Drug.score<-DrugScore(SC.integrated=SC.integrated,
-                     Gene.data=Gene.list,
-                     Cell.type=NULL, 
-                     Drug.data=Drug.ident.res,
-                     FDA.drug.only=TRUE,
-                     Case=Case, 
-                     Tissue="breast",
-                     GSE92742.gctx=GSE92742.gctx.path,
-                     GSE70138.gctx=GSE70138.gctx.path)
-#Cell.type: select cell types/clusters to be used for drug score estimation
-#Case: select samples to be used for drug score estimation
-#Please use " " instead of "-" in tissue name, for example, while haematopoietic-and-lymphoid-tissue is the prefix of the drug reference files, the corresponding tissue name is "haematopoietic and lymphoid tissue". 
-```
-Use '?DrugScore' for more help
+# Change the following two lines with the paths on your computer
+gse92742_gctx_path <- "GSE92742_Broad_LINCS_Level5_COMPZ.MODZ_n473647x12328.gctx"
+gse70138_gctx_path <- "GSE70138_Broad_LINCS_Level5_COMPZ_n118050x12328_2017-03-06.gctx"
 
-#### Step 6
-#### Select mono-drug therapies
+cell_metadata <- SC.integrated@meta.data
+cell_metadata$cluster <- SC.integrated@meta.data$celltype
+
+Drug.score <- DrugScore(cell_metadata, cluster_degs = Gene.list, 
+                        cluster_drugs = Drug.ident.res, tissue = "breast", 
+                        case = Case, gse92742_gctx_path = gse92742_gctx_path, 
+                        gse70138_gctx_path = gse70138_gctx_path)
+```
+
+#### Step 6: Select mono-drug therapies
 ```
 library('Asgard')
 library('Seurat')
