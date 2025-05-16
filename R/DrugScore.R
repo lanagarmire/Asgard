@@ -33,7 +33,7 @@ DrugScore <- function(cell_metadata, cluster_degs, cluster_drugs, tissue,
 
 	# Subset input data to the set of clusters we are interested in 
     if (length(clusters) > 0) {
-    	clusters = intersect(clusters, unique(cell_metada$cluster))
+    	clusters = intersect(clusters, unique(cell_metadata$cluster))
       	cell_metadata = subset(cell_metadata, cluster %in% clusters)
       	cluster_drugs = cluster_drugs[clusters]
       	cluster_degs = cluster_degs[clusters]
